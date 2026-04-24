@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <meta name="theme-color" content="#f5f4ef" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Sunny Corner" />
+  <meta name="description" content="Find the sunniest, most wind-sheltered spot in Copenhagen — right now." />
+  <title>Sunny Corner — find your sheltered sunny spot in Copenhagen</title>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <style>
+    :root {
+      --bg: #f5f4ef;
+      --surface: #ffffff;
+      --surface-2: #ebe9e0;
+      --text: #2c2c2a;
+      --text-muted: #5f5e5a;
+      --text-faint: #888780;
+      --border: rgba(0,0,0,0.12);
+      --border-strong: rgba(0,0,0,0.22);
+      --accent: #185fa5;
+      --accent-bg: #e6f1fb;
+      --success: #27500a;
+      --success-bg: #eaf3de;
+      --warn: #633806;
+      --warn-bg: #faeeda;
+      --danger: #791f1f;
+      --danger-bg: #fcebeb;
+      --water: #0a6e8e;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1f1f1d;
+        --surface: #2c2c2a;
+        --surface-2: #3a3a37;
+        --text: #e8e7e1;
+        --text-muted: #b4b2a9;
+        --text-faint: #888780;
+        --border: rgba(255,255,255,0.12);
+        --border-strong: rgba(255,255,255,0.22);
+        --accent-bg: #0c447c;
+        --success-bg: #27500a;
+        --warn-bg: #633806;
+        --danger-bg: #791f1f;
+        --water: #2fa2c8;
+      }
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text); font-family: var(--font); font-size: 16px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+
+    .container { max-width: 780px; margin: 0 auto; padding: 16px; }
+
+    header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 16px; }
+    h1 { font-size: 20px; font-weight: 500; margin: 0; }
+    .tagline { font-size: 12px; color: var(--text-faint); }
+
+    .status { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
+
+    .conditions { background: var(--surface-2); border-radius: var(--radius); padding: 12px 16px; margin-bottom: 12px; display: none; }
+    .conditions-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 12px; }
+    .condition-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
+    .condition-value { font-size: 15px; font-weight: 500; margin-top: 2px; }
+    .condition-value.water { color: var(--water); }
+
+    /* Day picker */
+    .day-picker { display: flex; gap: 6px; overflow-x: auto; margin-bottom: 10px; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
+    .day-picker::-webkit-scrollbar { height: 4px; }
+    .day-picker::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .day-chip {
+      flex: 0 0 auto;
+      min-width: 64px;
+      padding: 8px 12px;
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      text-align: center;
+      font-size: 12px;
+      transition: all 0.15s;
+    }
+    .day-chip:hover { border-color: var(--border-strong); }
+    .day-chip.active { background: var(--accent); color: white; border-color: var(--accent); }
+    .day-chip .dow { font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: 0.4px; }
+    .day-chip .dom { font-size: 16px; font-weight: 500; margin-top: 2px; }
+
+    /* Hour picker */
+    .hour-picker { display: flex; gap: 4px; overflow-x: auto; margin-bottom: 16px; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
+    .hour-picker::-webkit-scrollbar { height: 4px; }
+    .hour-picker::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .hour-chip {
+      flex: 0 0 auto;
+      min-width: 48px;
+      padding: 6px 10px;
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      text-align: center;
+      font-size: 12px;
+      font-weight: 500;
+      transition: all 0.15s;
+    }
+    .hour-chip:hover { border-color: var(--border-strong); }
+    .hour-chip.active { background: var(--accent); color: white; border-color: var(--accent); }
+    .hour-chip.now { border-color: var(--accent); color: var(--accent); }
+    .hour-chip.now.active { color: white; }
+
+    .picker-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px; }
+
+    #map { width: 100%; height: 440px; border-radius: var(--radius); overflow: hidden; margin-bottom: 8px; background: #e8eef4; border: 0.5px solid var(--border); }
+    .map-hint { font-size: 11px; color: var(--text-faint); margin-bottom: 12px; }
+
+    .filter-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+    .filter-chip {
+      font-size: 12px;
+      padding: 4px 10px;
+      background: var(--surface);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .filter-chip:hover { border-color: var(--border-strong); }
+    .filter-chip.active { background: var(--text); color: var(--bg); border-color: var(--text); }
+
+    .spot-card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 12px 16px; margin-bottom: 8px; cursor: pointer; transition: border-color 0.15s; }
+    .spot-card:hover { border-color: var(--border-strong); }
+    .spot-header { display: flex; justify-content: space-between; align-items: start; gap: 12px; }
+    .spot-name-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; flex-wrap: wrap; }
+    .rank { font-size: 13px; color: var(--text-faint); font-weight: 500; }
+    .spot-name { font-size: 15px; font-weight: 500; }
+    .badge { font-size: 11px; padding: 2px 8px; border-radius: var(--radius-sm); }
+    .badge-great { background: var(--success-bg); color: var(--success); }
+    .badge-ok { background: var(--warn-bg); color: var(--warn); }
+    .badge-poor { background: var(--danger-bg); color: var(--danger); }
+    .badge-type { background: var(--accent-bg); color: var(--accent); font-size: 10px; }
+    @media (prefers-color-scheme: dark) {
+      .badge-great { color: #c0dd97; }
+      .badge-ok { color: #fac775; }
+      .badge-poor { color: #f7c1c1; }
+      .badge-type { color: #88bce8; }
+    }
+    .spot-desc { font-size: 13px; color: var(--text-muted); margin-bottom: 6px; }
+    .spot-stats { font-size: 12px; color: var(--text-faint); }
+    .spot-water { font-size: 12px; color: var(--water); margin-top: 4px; }
+    .spot-score { font-size: 22px; font-weight: 500; min-width: 40px; text-align: right; }
+    .warmer { font-size: 11px; color: var(--success); margin-left: 4px; }
+    @media (prefers-color-scheme: dark) { .warmer { color: #c0dd97; } }
+
+    .show-more { text-align: center; padding: 12px; font-size: 13px; color: var(--accent); cursor: pointer; }
+
+    footer { margin-top: 24px; padding-top: 16px; border-top: 0.5px solid var(--border); font-size: 11px; color: var(--text-faint); line-height: 1.6; }
+    footer a { color: var(--text-muted); }
+
+    .wind-control { background: var(--surface); color: var(--text); padding: 8px 10px; border-radius: var(--radius-sm); box-shadow: 0 1px 4px rgba(0,0,0,0.2); text-align: center; min-width: 70px; font-family: var(--font); }
+    .leaflet-popup-content-wrapper { border-radius: var(--radius); }
+    .popup-body { font-family: var(--font); min-width: 180px; }
+    .popup-title { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+    .popup-desc { font-size: 12px; color: #555; margin-bottom: 8px; }
+    .popup-stats { font-size: 12px; line-height: 1.6; }
+    .popup-water { font-size: 12px; color: #0a6e8e; margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>Sunny Corner</h1>
+        <div class="tagline">Copenhagen's wind is a personal attack. Find where it can't reach you.</div>
+      </div>
+    </header>
+
+    <div id="status" class="status">Loading live weather…</div>
+
+    <div id="conditions" class="conditions">
+      <div class="conditions-grid">
+        <div><div class="condition-label">Wind</div><div class="condition-value" id="wind-display">—</div></div>
+        <div><div class="condition-label">Air temp</div><div class="condition-value" id="temp-display">—</div></div>
+        <div><div class="condition-label">Feels like</div><div class="condition-value" id="feel-display">—</div></div>
+        <div><div class="condition-label">Cloud</div><div class="condition-value" id="cloud-display">—</div></div>
+        <div><div class="condition-label">Sun</div><div class="condition-value" id="sun-display">—</div></div>
+        <div><div class="condition-label">Water</div><div class="condition-value water" id="water-display">—</div></div>
+      </div>
+    </div>
+
+    <div id="pickers" style="display:none">
+      <div class="picker-label">Day</div>
+      <div class="day-picker" id="day-picker"></div>
+      <div class="picker-label">Hour</div>
+      <div class="hour-picker" id="hour-picker"></div>
+    </div>
+
+    <div id="map"></div>
+    <div class="map-hint">Drag to pan · scroll or pinch to zoom · tap a marker for details</div>
+
+    <div class="filter-row" id="filter-row"></div>
+    <div id="spots-list"></div>
+    <div id="show-more-wrap"></div>
+
+    <footer>
+      v0.2.1 · Sunny Corner · Weather &amp; marine data from <a href="https://open-meteo.com" target="_blank" rel="noopener">Open-Meteo</a>.
+      Map tiles &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors.
+      Shelter scores hand-curated (less reliable for newer spots) — feedback welcome.
+    </footer>
+  </div>
+
+  <script>
+  (function() {
+
+    // ============ SPOTS DATA ============
+    // 50 spots across Copenhagen. Shelter values are 16-direction estimates.
+    // Types: park, beach, harbour, plaza, rooftop, cemetery, garden, forest
+    // confident=true: profile carefully researched. confident=false: rough estimate.
+    var SPOTS = [
+      // Central parks & gardens (well-profiled)
+      { name: "Kongens Have (King's Garden)", lat: 55.6847, lon: 12.5821, type: "garden", desc: "Walled palace garden, hedges and mature trees", confident: true,
+        shelter: {N:0.8,NNE:0.78,NE:0.75,ENE:0.78,E:0.8,ESE:0.75,SE:0.7,SSE:0.67,S:0.65,SSW:0.67,SW:0.7,WSW:0.75,W:0.8,WNW:0.82,NW:0.85,NNW:0.82}, openness:0.7, facing:'S' },
+      { name: "Botanisk Have", lat: 55.6866, lon: 12.5725, type: "garden", desc: "Botanical garden, greenhouses and lawns", confident: true,
+        shelter: {N:0.7,NNE:0.7,NE:0.7,ENE:0.67,E:0.65,ESE:0.62,SE:0.6,SSE:0.6,S:0.6,SSW:0.62,SW:0.65,WSW:0.67,W:0.7,WNW:0.72,NW:0.75,NNW:0.72}, openness:0.7, facing:'S' },
+      { name: "Ørstedsparken", lat: 55.6821, lon: 12.5695, type: "park", desc: "Romantic 19th-c. park, old fortification embankments", confident: true,
+        shelter: {N:0.7,NNE:0.7,NE:0.68,ENE:0.65,E:0.62,ESE:0.6,SE:0.6,SSE:0.6,S:0.6,SSW:0.62,SW:0.65,WSW:0.67,W:0.7,WNW:0.72,NW:0.72,NNW:0.72}, openness:0.7, facing:'S' },
+      { name: "Rosenborg Castle Lawn", lat: 55.6857, lon: 12.5796, type: "garden", desc: "Large lawn fronting Rosenborg Castle", confident: true,
+        shelter: {N:0.7,NNE:0.7,NE:0.68,ENE:0.62,E:0.6,ESE:0.55,SE:0.5,SSE:0.5,S:0.5,SSW:0.55,SW:0.6,WSW:0.65,W:0.7,WNW:0.72,NW:0.75,NNW:0.72}, openness:0.75, facing:'S' },
+      { name: "Frederiksberg Have", lat: 55.6738, lon: 12.5302, type: "park", desc: "Large romantic park with lawns, trees, and lake", confident: true,
+        shelter: {N:0.65,NNE:0.62,NE:0.6,ENE:0.57,E:0.55,ESE:0.57,SE:0.6,SSE:0.57,S:0.55,SSW:0.57,SW:0.6,WSW:0.62,W:0.65,WNW:0.67,NW:0.7,NNW:0.67}, openness:0.65, facing:'S' },
+      { name: "Søndermarken", lat: 55.6711, lon: 12.5248, type: "park", desc: "Park south of the zoo, hills and meadows", confident: true,
+        shelter: {N:0.62,NNE:0.6,NE:0.6,ENE:0.58,E:0.55,ESE:0.55,SE:0.55,SSE:0.55,S:0.55,SSW:0.57,SW:0.6,WSW:0.62,W:0.65,WNW:0.65,NW:0.65,NNW:0.65}, openness:0.7, facing:'S' },
+      { name: "Assistens Cemetery Lawns", lat: 55.6883, lon: 12.5497, type: "cemetery", desc: "Walled green space, trees, south-facing lawns", confident: true,
+        shelter: {N:0.75,NNE:0.72,NE:0.7,ENE:0.67,E:0.65,ESE:0.57,SE:0.5,SSE:0.45,S:0.4,SSW:0.45,SW:0.5,WSW:0.57,W:0.65,WNW:0.7,NW:0.75,NNW:0.75}, openness:0.75, facing:'S' },
+      { name: "Vestre Kirkegård", lat: 55.6557, lon: 12.5352, type: "cemetery", desc: "Largest cemetery, park-like with open lawns", confident: false,
+        shelter: {N:0.6,NNE:0.58,NE:0.55,ENE:0.53,E:0.5,ESE:0.5,SE:0.5,SSE:0.5,S:0.5,SSW:0.53,SW:0.55,WSW:0.58,W:0.6,WNW:0.62,NW:0.62,NNW:0.62}, openness:0.8, facing:'S' },
+      { name: "Valbyparken", lat: 55.6451, lon: 12.5177, type: "park", desc: "Large suburban park with themed gardens", confident: false,
+        shelter: {N:0.55,NNE:0.53,NE:0.5,ENE:0.5,E:0.5,ESE:0.5,SE:0.5,SSE:0.5,S:0.5,SSW:0.5,SW:0.5,WSW:0.53,W:0.55,WNW:0.57,NW:0.6,NNW:0.58}, openness:0.8, facing:'S' },
+      { name: "Fælledparken", lat: 55.7033, lon: 12.5625, type: "park", desc: "Largest central park, open fields", confident: true,
+        shelter: {N:0.35,NNE:0.35,NE:0.35,ENE:0.35,E:0.35,ESE:0.35,SE:0.35,SSE:0.35,S:0.35,SSW:0.35,SW:0.35,WSW:0.35,W:0.35,WNW:0.35,NW:0.35,NNW:0.35}, openness:0.95, facing:'S' },
+      { name: "Amager Fælled", lat: 55.6516, lon: 12.5766, type: "park", desc: "Wild nature reserve, grasslands and scrub", confident: false,
+        shelter: {N:0.3,NNE:0.3,NE:0.3,ENE:0.3,E:0.3,ESE:0.3,SE:0.3,SSE:0.3,S:0.3,SSW:0.3,SW:0.3,WSW:0.3,W:0.3,WNW:0.3,NW:0.3,NNW:0.3}, openness:0.95, facing:'S' },
+      { name: "Kongelunden", lat: 55.5734, lon: 12.5766, type: "forest", desc: "Coastal forest on south Amager", confident: false,
+        shelter: {N:0.8,NNE:0.78,NE:0.75,ENE:0.75,E:0.75,ESE:0.75,SE:0.75,SSE:0.75,S:0.75,SSW:0.75,SW:0.75,WSW:0.75,W:0.78,WNW:0.78,NW:0.78,NNW:0.78}, openness:0.5, facing:'S' },
+      { name: "Dyrehaven (south entry)", lat: 55.7811, lon: 12.5710, type: "forest", desc: "Royal deer park, ancient oaks", confident: false,
+        shelter: {N:0.8,NNE:0.78,NE:0.75,ENE:0.75,E:0.75,ESE:0.75,SE:0.75,SSE:0.75,S:0.75,SSW:0.75,SW:0.75,WSW:0.75,W:0.78,WNW:0.78,NW:0.78,NNW:0.78}, openness:0.55, facing:'S' },
+      { name: "Lersø Park", lat: 55.7142, lon: 12.5527, type: "park", desc: "Northern green corridor, sports fields", confident: false,
+        shelter: {N:0.5,NNE:0.5,NE:0.5,ENE:0.5,E:0.5,ESE:0.5,SE:0.5,SSE:0.5,S:0.5,SSW:0.5,SW:0.5,WSW:0.5,W:0.5,WNW:0.5,NW:0.5,NNW:0.5}, openness:0.8, facing:'S' },
+      { name: "De Gamles By Garden", lat: 55.6908, lon: 12.5486, type: "garden", desc: "Hidden walled garden in Nørrebro", confident: false,
+        shelter: {N:0.72,NNE:0.7,NE:0.68,ENE:0.65,E:0.65,ESE:0.65,SE:0.65,SSE:0.65,S:0.65,SSW:0.68,SW:0.7,WSW:0.72,W:0.75,WNW:0.75,NW:0.75,NNW:0.72}, openness:0.65, facing:'S' },
+      { name: "Grønnegården (Kunstindustrimuseet)", lat: 55.6857, lon: 12.5902, type: "garden", desc: "Museum courtyard garden, quiet oasis", confident: false,
+        shelter: {N:0.88,NNE:0.85,NE:0.85,ENE:0.85,E:0.85,ESE:0.85,SE:0.85,SSE:0.85,S:0.85,SSW:0.85,SW:0.85,WSW:0.85,W:0.88,WNW:0.88,NW:0.88,NNW:0.88}, openness:0.55, facing:'S' },
+
+      // Harbour, canal-side & waterfront (water=true for marine data)
+      { name: "Islands Brygge Harbour Bath", lat: 55.6686, lon: 12.5797, type: "harbour", water: true, desc: "Wooden piers, grass strip, south-facing waterfront", confident: true,
+        shelter: {N:0.2,NNE:0.25,NE:0.3,ENE:0.2,E:0.1,ESE:0.15,SE:0.2,SSE:0.25,S:0.3,SSW:0.4,SW:0.5,WSW:0.6,W:0.75,WNW:0.65,NW:0.5,NNW:0.35}, openness:0.85, facing:'E' },
+      { name: "Islands Brygge Park", lat: 55.6735, lon: 12.5800, type: "harbour", water: true, desc: "Grassy strip along harbour north of the bath", confident: true,
+        shelter: {N:0.2,NNE:0.25,NE:0.3,ENE:0.2,E:0.1,ESE:0.15,SE:0.2,SSE:0.25,S:0.3,SSW:0.4,SW:0.5,WSW:0.6,W:0.75,WNW:0.65,NW:0.5,NNW:0.35}, openness:0.85, facing:'E' },
+      { name: "Havneparken (Copenhagen Harbour Park)", lat: 55.6612, lon: 12.5818, type: "harbour", water: true, desc: "Wide harbour promenade south of the bath", confident: false,
+        shelter: {N:0.25,NNE:0.3,NE:0.35,ENE:0.25,E:0.15,ESE:0.2,SE:0.25,SSE:0.3,S:0.35,SSW:0.45,SW:0.5,WSW:0.55,W:0.7,WNW:0.6,NW:0.45,NNW:0.35}, openness:0.9, facing:'E' },
+      { name: "Nyhavn South Side", lat: 55.6797, lon: 12.5932, type: "canal", water: true, desc: "Canal-side, colourful facades block north wind", confident: true,
+        shelter: {N:0.85,NNE:0.82,NE:0.75,ENE:0.55,E:0.4,ESE:0.3,SE:0.2,SSE:0.17,S:0.15,SSW:0.22,SW:0.3,WSW:0.4,W:0.5,WNW:0.65,NW:0.8,NNW:0.83}, openness:0.75, facing:'S' },
+      { name: "Nyhavn North Side", lat: 55.6802, lon: 12.5932, type: "canal", water: true, desc: "Canal-side, facades block south wind", confident: true,
+        shelter: {N:0.15,NNE:0.22,NE:0.3,ENE:0.4,E:0.5,ESE:0.65,SE:0.8,SSE:0.83,S:0.85,SSW:0.82,SW:0.75,WSW:0.55,W:0.4,WNW:0.3,NW:0.2,NNW:0.17}, openness:0.75, facing:'N' },
+      { name: "Ofelia Plads", lat: 55.6823, lon: 12.5948, type: "plaza", water: true, desc: "Waterfront plaza next to Royal Playhouse", confident: true,
+        shelter: {N:0.6,NNE:0.57,NE:0.55,ENE:0.4,E:0.2,ESE:0.25,SE:0.3,SSE:0.37,S:0.45,SSW:0.5,SW:0.55,WSW:0.57,W:0.6,WNW:0.57,NW:0.55,NNW:0.57}, openness:0.9, facing:'E' },
+      { name: "Kvæsthusmolen", lat: 55.6812, lon: 12.5964, type: "harbour", water: true, desc: "Quay south of Ofelia Plads, very exposed to east", confident: false,
+        shelter: {N:0.55,NNE:0.52,NE:0.5,ENE:0.35,E:0.15,ESE:0.2,SE:0.25,SSE:0.32,S:0.4,SSW:0.45,SW:0.5,WSW:0.52,W:0.55,WNW:0.52,NW:0.5,NNW:0.52}, openness:0.95, facing:'E' },
+      { name: "Langelinie Promenade", lat: 55.6928, lon: 12.5991, type: "harbour", water: true, desc: "Waterside walk near The Little Mermaid", confident: true,
+        shelter: {N:0.35,NNE:0.3,NE:0.25,ENE:0.2,E:0.15,ESE:0.2,SE:0.3,SSE:0.35,S:0.4,SSW:0.45,SW:0.5,WSW:0.55,W:0.55,WNW:0.5,NW:0.42,NNW:0.37}, openness:0.95, facing:'E' },
+      { name: "Kastellet Ramparts", lat: 55.6905, lon: 12.5938, type: "fortress", desc: "Star fortress earthworks, grassy embankments", confident: true,
+        shelter: {N:0.6,NNE:0.57,NE:0.55,ENE:0.52,E:0.5,ESE:0.52,SE:0.55,SSE:0.57,S:0.6,SSW:0.62,SW:0.65,WSW:0.62,W:0.6,WNW:0.57,NW:0.55,NNW:0.57}, openness:0.85, facing:'S' },
+      { name: "Refshaleøen Harbour", lat: 55.6913, lon: 12.6020, type: "harbour", water: true, desc: "Industrial waterfront, very exposed", confident: true,
+        shelter: {N:0.3,NNE:0.25,NE:0.2,ENE:0.17,E:0.15,ESE:0.17,SE:0.2,SSE:0.25,S:0.3,SSW:0.32,SW:0.35,WSW:0.37,W:0.4,WNW:0.37,NW:0.3,NNW:0.3}, openness:0.95, facing:'SE' },
+      { name: "La Banchina", lat: 55.6873, lon: 12.6000, type: "harbour", water: true, desc: "Tiny bathing deck and café, sheltered basin", confident: false,
+        shelter: {N:0.55,NNE:0.5,NE:0.45,ENE:0.4,E:0.35,ESE:0.4,SE:0.5,SSE:0.55,S:0.6,SSW:0.58,SW:0.55,WSW:0.55,W:0.55,WNW:0.55,NW:0.55,NNW:0.55}, openness:0.9, facing:'W' },
+      { name: "Reffen", lat: 55.6938, lon: 12.6056, type: "harbour", water: true, desc: "Street food market, waterfront picnic tables", confident: false,
+        shelter: {N:0.4,NNE:0.37,NE:0.35,ENE:0.32,E:0.3,ESE:0.32,SE:0.35,SSE:0.37,S:0.4,SSW:0.42,SW:0.45,WSW:0.47,W:0.5,WNW:0.47,NW:0.42,NNW:0.4}, openness:0.9, facing:'W' },
+      { name: "Sandkaj", lat: 55.7028, lon: 12.5942, type: "harbour", water: true, desc: "Popular swim spot in Nordhavn, wooden deck", confident: false,
+        shelter: {N:0.45,NNE:0.42,NE:0.4,ENE:0.35,E:0.3,ESE:0.35,SE:0.4,SSE:0.45,S:0.5,SSW:0.52,SW:0.52,WSW:0.5,W:0.5,WNW:0.5,NW:0.48,NNW:0.47}, openness:0.9, facing:'W' },
+      { name: "Århusgadekvarteret Quay", lat: 55.7007, lon: 12.5939, type: "harbour", water: true, desc: "Nordhavn residential waterfront", confident: false,
+        shelter: {N:0.5,NNE:0.47,NE:0.45,ENE:0.4,E:0.35,ESE:0.4,SE:0.45,SSE:0.5,S:0.55,SSW:0.55,SW:0.52,WSW:0.5,W:0.5,WNW:0.52,NW:0.52,NNW:0.5}, openness:0.85, facing:'W' },
+      { name: "Amager Strandpark (dunes)", lat: 55.6556, lon: 12.6352, type: "beach", water: true, desc: "Long sandy beach with dune shelters", confident: true,
+        shelter: {N:0.25,NNE:0.2,NE:0.15,ENE:0.12,E:0.1,ESE:0.12,SE:0.15,SSE:0.22,S:0.3,SSW:0.4,SW:0.5,WSW:0.55,W:0.6,WNW:0.55,NW:0.45,NNW:0.35}, openness:0.95, facing:'E' },
+      { name: "Amager Strandpark (lagoon)", lat: 55.6605, lon: 12.6363, type: "beach", water: true, desc: "Inner lagoon side, calmer water", confident: false,
+        shelter: {N:0.3,NNE:0.28,NE:0.25,ENE:0.3,E:0.4,ESE:0.35,SE:0.25,SSE:0.27,S:0.3,SSW:0.4,SW:0.5,WSW:0.55,W:0.6,WNW:0.55,NW:0.45,NNW:0.37}, openness:0.9, facing:'W' },
+      { name: "Helgoland Sea Baths", lat: 55.6570, lon: 12.6408, type: "beach", water: true, desc: "Wooden baths at northern end of Amager Strand", confident: false,
+        shelter: {N:0.22,NNE:0.2,NE:0.18,ENE:0.15,E:0.12,ESE:0.15,SE:0.2,SSE:0.25,S:0.3,SSW:0.38,SW:0.45,WSW:0.5,W:0.55,WNW:0.5,NW:0.4,NNW:0.3}, openness:0.95, facing:'E' },
+      { name: "Kastrup Søbad (Snail)", lat: 55.6355, lon: 12.6530, type: "beach", water: true, desc: "Iconic spiral wooden sea bath", confident: true,
+        shelter: {N:0.25,NNE:0.22,NE:0.2,ENE:0.17,E:0.15,ESE:0.17,SE:0.22,SSE:0.27,S:0.32,SSW:0.38,SW:0.45,WSW:0.5,W:0.55,WNW:0.5,NW:0.42,NNW:0.32}, openness:0.98, facing:'E' },
+      { name: "Svanemølle Beach", lat: 55.7201, lon: 12.5968, type: "beach", water: true, desc: "Small urban beach north of Nordhavn", confident: false,
+        shelter: {N:0.3,NNE:0.27,NE:0.25,ENE:0.22,E:0.2,ESE:0.22,SE:0.27,SSE:0.32,S:0.38,SSW:0.42,SW:0.48,WSW:0.52,W:0.55,WNW:0.5,NW:0.42,NNW:0.35}, openness:0.9, facing:'E' },
+      { name: "Bellevue Beach", lat: 55.7635, lon: 12.5886, type: "beach", water: true, desc: "Classic north-Copenhagen beach (Arne Jacobsen era)", confident: false,
+        shelter: {N:0.3,NNE:0.27,NE:0.2,ENE:0.17,E:0.15,ESE:0.18,SE:0.22,SSE:0.27,S:0.33,SSW:0.4,SW:0.48,WSW:0.55,W:0.6,WNW:0.55,NW:0.45,NNW:0.37}, openness:0.95, facing:'E' },
+      { name: "Charlottenlund Fort beach", lat: 55.7486, lon: 12.5910, type: "beach", water: true, desc: "Old fort with beach and grass, sheltered by ramparts", confident: false,
+        shelter: {N:0.5,NNE:0.47,NE:0.45,ENE:0.4,E:0.35,ESE:0.4,SE:0.45,SSE:0.48,S:0.5,SSW:0.52,SW:0.55,WSW:0.55,W:0.55,WNW:0.52,NW:0.5,NNW:0.5}, openness:0.85, facing:'E' },
+
+      // Plazas (urban, good building shelter)
+      { name: "Superkilen (Red Square)", lat: 55.6991, lon: 12.5411, type: "plaza", desc: "Urban plaza, buildings on all sides", confident: true,
+        shelter: {N:0.7,NNE:0.68,NE:0.65,ENE:0.62,E:0.6,ESE:0.57,SE:0.55,SSE:0.52,S:0.5,SSW:0.55,SW:0.6,WSW:0.65,W:0.7,WNW:0.72,NW:0.75,NNW:0.72}, openness:0.75, facing:'S' },
+      { name: "Sankt Hans Torv", lat: 55.6894, lon: 12.5590, type: "plaza", desc: "Nørrebro plaza, cafés on all corners", confident: true,
+        shelter: {N:0.7,NNE:0.7,NE:0.7,ENE:0.67,E:0.65,ESE:0.62,SE:0.6,SSE:0.57,S:0.55,SSW:0.57,SW:0.6,WSW:0.65,W:0.7,WNW:0.72,NW:0.75,NNW:0.72}, openness:0.6, facing:'SW' },
+      { name: "Gråbrødretorv", lat: 55.6791, lon: 12.5751, type: "plaza", desc: "Old-town square, tall buildings all around", confident: true,
+        shelter: {N:0.82,NNE:0.8,NE:0.78,ENE:0.77,E:0.77,ESE:0.77,SE:0.77,SSE:0.77,S:0.77,SSW:0.77,SW:0.78,WSW:0.78,W:0.8,WNW:0.82,NW:0.82,NNW:0.82}, openness:0.55, facing:'S' },
+      { name: "Kultorvet", lat: 55.6814, lon: 12.5754, type: "plaza", desc: "Pedestrian square with cafés, mostly enclosed", confident: false,
+        shelter: {N:0.75,NNE:0.72,NE:0.7,ENE:0.7,E:0.7,ESE:0.7,SE:0.7,SSE:0.7,S:0.7,SSW:0.72,SW:0.72,WSW:0.72,W:0.75,WNW:0.75,NW:0.75,NNW:0.75}, openness:0.6, facing:'S' },
+      { name: "Blågårds Plads", lat: 55.6889, lon: 12.5534, type: "plaza", desc: "Nørrebro square, benches on sunny side", confident: false,
+        shelter: {N:0.72,NNE:0.7,NE:0.68,ENE:0.65,E:0.65,ESE:0.62,SE:0.6,SSE:0.58,S:0.55,SSW:0.58,SW:0.6,WSW:0.65,W:0.7,WNW:0.72,NW:0.72,NNW:0.72}, openness:0.65, facing:'S' },
+      { name: "Israels Plads", lat: 55.6834, lon: 12.5697, type: "plaza", desc: "Renovated plaza and market, open aspect", confident: false,
+        shelter: {N:0.55,NNE:0.53,NE:0.52,ENE:0.5,E:0.48,ESE:0.48,SE:0.5,SSE:0.5,S:0.5,SSW:0.52,SW:0.55,WSW:0.57,W:0.6,WNW:0.6,NW:0.6,NNW:0.58}, openness:0.85, facing:'S' },
+      { name: "Halmtorvet", lat: 55.6697, lon: 12.5630, type: "plaza", desc: "Vesterbro plaza with fountains and cafés", confident: false,
+        shelter: {N:0.7,NNE:0.7,NE:0.68,ENE:0.65,E:0.62,ESE:0.62,SE:0.62,SSE:0.62,S:0.62,SSW:0.65,SW:0.68,WSW:0.7,W:0.72,WNW:0.72,NW:0.72,NNW:0.7}, openness:0.7, facing:'S' },
+      { name: "Enghave Plads", lat: 55.6681, lon: 12.5497, type: "plaza", desc: "Vesterbro square with benches around edge", confident: false,
+        shelter: {N:0.65,NNE:0.63,NE:0.6,ENE:0.58,E:0.58,ESE:0.58,SE:0.58,SSE:0.6,S:0.6,SSW:0.62,SW:0.63,WSW:0.65,W:0.67,WNW:0.68,NW:0.68,NNW:0.67}, openness:0.75, facing:'S' },
+      { name: "Kongens Nytorv", lat: 55.6792, lon: 12.5854, type: "plaza", desc: "Huge central square, buildings around but very open", confident: true,
+        shelter: {N:0.4,NNE:0.4,NE:0.4,ENE:0.4,E:0.4,ESE:0.4,SE:0.4,SSE:0.4,S:0.4,SSW:0.4,SW:0.4,WSW:0.4,W:0.4,WNW:0.4,NW:0.4,NNW:0.4}, openness:0.95, facing:'S' },
+      { name: "Gammeltorv/Nytorv", lat: 55.6783, lon: 12.5719, type: "plaza", desc: "Connected medieval squares in old town", confident: false,
+        shelter: {N:0.72,NNE:0.7,NE:0.7,ENE:0.7,E:0.7,ESE:0.7,SE:0.7,SSE:0.7,S:0.7,SSW:0.7,SW:0.7,WSW:0.7,W:0.72,WNW:0.75,NW:0.75,NNW:0.75}, openness:0.6, facing:'S' },
+
+      // Rooftops & elevated
+      { name: "CopenHill Roof Park", lat: 55.6915, lon: 12.6133, type: "rooftop", desc: "Rooftop park on waste plant, ski slope views", confident: false,
+        shelter: {N:0.15,NNE:0.12,NE:0.1,ENE:0.1,E:0.1,ESE:0.1,SE:0.1,SSE:0.12,S:0.15,SSW:0.17,SW:0.2,WSW:0.22,W:0.25,WNW:0.22,NW:0.18,NNW:0.15}, openness:1.0, facing:'S' },
+      { name: "Amager Bakke viewpoint", lat: 55.6920, lon: 12.6128, type: "rooftop", desc: "Observation platform atop CopenHill", confident: false,
+        shelter: {N:0.1,NNE:0.1,NE:0.1,ENE:0.1,E:0.1,ESE:0.1,SE:0.1,SSE:0.1,S:0.1,SSW:0.1,SW:0.1,WSW:0.1,W:0.1,WNW:0.1,NW:0.1,NNW:0.1}, openness:1.0, facing:'S' },
+      { name: "Rundetårn top", lat: 55.6814, lon: 12.5761, type: "rooftop", desc: "Round Tower observation deck", confident: false,
+        shelter: {N:0.2,NNE:0.2,NE:0.2,ENE:0.2,E:0.2,ESE:0.2,SE:0.2,SSE:0.2,S:0.2,SSW:0.2,SW:0.2,WSW:0.2,W:0.2,WNW:0.2,NW:0.2,NNW:0.2}, openness:1.0, facing:'S' },
+      { name: "Illum Rooftop", lat: 55.6790, lon: 12.5800, type: "rooftop", desc: "Department store roof garden & café", confident: false,
+        shelter: {N:0.5,NNE:0.5,NE:0.5,ENE:0.5,E:0.5,ESE:0.5,SE:0.5,SSE:0.5,S:0.5,SSW:0.5,SW:0.5,WSW:0.5,W:0.5,WNW:0.5,NW:0.5,NNW:0.5}, openness:0.85, facing:'S' },
+
+      // Copenhagen lakes
+      { name: "Sortedams Sø (east bank)", lat: 55.6916, lon: 12.5624, type: "lake", water: true, desc: "Lakeside path, east bank faces morning sun", confident: false,
+        shelter: {N:0.45,NNE:0.42,NE:0.4,ENE:0.5,E:0.6,ESE:0.55,SE:0.45,SSE:0.45,S:0.45,SSW:0.45,SW:0.42,WSW:0.4,W:0.35,WNW:0.37,NW:0.4,NNW:0.42}, openness:0.85, facing:'W' },
+      { name: "Sortedams Sø (west bank)", lat: 55.6916, lon: 12.5615, type: "lake", water: true, desc: "Lakeside path, west bank faces afternoon sun", confident: false,
+        shelter: {N:0.45,NNE:0.42,NE:0.4,ENE:0.35,E:0.35,ESE:0.4,SE:0.45,SSE:0.5,S:0.55,SSW:0.5,SW:0.45,WSW:0.45,W:0.45,WNW:0.45,NW:0.42,NNW:0.42}, openness:0.85, facing:'E' },
+      { name: "Peblinge Sø", lat: 55.6852, lon: 12.5592, type: "lake", water: true, desc: "Middle of the three central lakes", confident: false,
+        shelter: {N:0.45,NNE:0.45,NE:0.45,ENE:0.45,E:0.45,ESE:0.45,SE:0.45,SSE:0.45,S:0.45,SSW:0.45,SW:0.45,WSW:0.45,W:0.45,WNW:0.45,NW:0.45,NNW:0.45}, openness:0.85, facing:'S' },
+      { name: "Sankt Jørgens Sø", lat: 55.6812, lon: 12.5560, type: "lake", water: true, desc: "Southernmost of central lakes, joggers' favorite", confident: false,
+        shelter: {N:0.48,NNE:0.48,NE:0.48,ENE:0.48,E:0.48,ESE:0.48,SE:0.48,SSE:0.48,S:0.48,SSW:0.48,SW:0.48,WSW:0.48,W:0.48,WNW:0.48,NW:0.48,NNW:0.48}, openness:0.85, facing:'S' },
+      { name: "Damhussøen", lat: 55.6848, lon: 12.4898, type: "lake", water: true, desc: "Large suburban lake with surrounding parkland", confident: false,
+        shelter: {N:0.45,NNE:0.45,NE:0.45,ENE:0.45,E:0.45,ESE:0.45,SE:0.45,SSE:0.45,S:0.45,SSW:0.45,SW:0.45,WSW:0.45,W:0.45,WNW:0.45,NW:0.45,NNW:0.45}, openness:0.85, facing:'S' },
+
+      // ── 10 new spots from v0.2.1 brief ──
+      { name: "Fælledparken (open lawn)", lat: 55.7033, lon: 12.5625, type: "park", desc: "Largest central park, vast open fields — very exposed", confident: true,
+        shelter: {N:0.25,NNE:0.25,NE:0.25,ENE:0.25,E:0.25,ESE:0.25,SE:0.25,SSE:0.25,S:0.25,SSW:0.25,SW:0.25,WSW:0.25,W:0.25,WNW:0.25,NW:0.25,NNW:0.25}, openness:0.98, facing:'S' },
+      { name: "Ørstedsparken", lat: 55.6821, lon: 12.5695, type: "park", desc: "Walled romantic park on old fortification banks", confident: true,
+        shelter: {N:0.72,NNE:0.7,NE:0.68,ENE:0.65,E:0.62,ESE:0.6,SE:0.6,SSE:0.6,S:0.6,SSW:0.62,SW:0.65,WSW:0.67,W:0.7,WNW:0.72,NW:0.72,NNW:0.72}, openness:0.7, facing:'S' },
+      { name: "Søndermarken", lat: 55.6711, lon: 12.5248, type: "park", desc: "Hilly park south of the zoo, meadows and slopes", confident: true,
+        shelter: {N:0.62,NNE:0.6,NE:0.6,ENE:0.58,E:0.55,ESE:0.55,SE:0.55,SSE:0.55,S:0.55,SSW:0.57,SW:0.6,WSW:0.62,W:0.65,WNW:0.65,NW:0.65,NNW:0.65}, openness:0.72, facing:'S' },
+      { name: "Langelinie Park", lat: 55.6935, lon: 12.5980, type: "park", water: true, desc: "Formal harbour-side park north of Kastellet", confident: true,
+        shelter: {N:0.3,NNE:0.27,NE:0.22,ENE:0.18,E:0.15,ESE:0.18,SE:0.25,SSE:0.32,S:0.4,SSW:0.45,SW:0.5,WSW:0.55,W:0.55,WNW:0.5,NW:0.42,NNW:0.35}, openness:0.9, facing:'E' },
+      { name: "Sandkaj Harbour Bath", lat: 55.7028, lon: 12.5942, type: "harbour", water: true, desc: "Popular Nordhavn swim spot, wooden deck facing west", confident: true,
+        shelter: {N:0.45,NNE:0.42,NE:0.4,ENE:0.35,E:0.3,ESE:0.35,SE:0.4,SSE:0.45,S:0.5,SSW:0.52,SW:0.52,WSW:0.5,W:0.5,WNW:0.5,NW:0.48,NNW:0.47}, openness:0.9, facing:'W' },
+      { name: "Christianshavn Canal Quay", lat: 55.6736, lon: 12.5911, type: "canal", water: true, desc: "South-facing canal quay lined with houseboats", confident: true,
+        shelter: {N:0.78,NNE:0.75,NE:0.7,ENE:0.6,E:0.45,ESE:0.35,SE:0.22,SSE:0.18,S:0.15,SSW:0.2,SW:0.32,WSW:0.45,W:0.6,WNW:0.72,NW:0.78,NNW:0.8}, openness:0.75, facing:'S' },
+      { name: "Tivoli Gardens", lat: 55.6752, lon: 12.5685, type: "garden", desc: "Amusement park gardens, dense planting and buildings", confident: true,
+        shelter: {N:0.82,NNE:0.8,NE:0.78,ENE:0.78,E:0.78,ESE:0.78,SE:0.78,SSE:0.78,S:0.78,SSW:0.78,SW:0.78,WSW:0.78,W:0.8,WNW:0.82,NW:0.82,NNW:0.82}, openness:0.55, facing:'S' },
+      { name: "Skydebanehaven", lat: 55.6698, lon: 12.5542, type: "garden", desc: "Tiny walled garden in Vesterbro — almost fully enclosed", confident: true,
+        shelter: {N:0.9,NNE:0.88,NE:0.88,ENE:0.88,E:0.88,ESE:0.88,SE:0.88,SSE:0.88,S:0.88,SSW:0.88,SW:0.88,WSW:0.88,W:0.9,WNW:0.9,NW:0.9,NNW:0.9}, openness:0.5, facing:'S' },
+      { name: "Kastrup Søbad (Sneglen)", lat: 55.6355, lon: 12.6530, type: "beach", water: true, desc: "Iconic spiral sea bath, exposed on all sides except west", confident: true,
+        shelter: {N:0.18,NNE:0.15,NE:0.12,ENE:0.12,E:0.12,ESE:0.12,SE:0.15,SSE:0.18,S:0.22,SSW:0.28,SW:0.38,WSW:0.5,W:0.55,WNW:0.48,NW:0.32,NNW:0.22}, openness:0.98, facing:'E' },
+      { name: "Dronning Louises Bro", lat: 55.6879, lon: 12.5607, type: "plaza", water: true, desc: "Wide bridge across the lakes — exposed and social", confident: true,
+        shelter: {N:0.15,NNE:0.15,NE:0.15,ENE:0.15,E:0.2,ESE:0.22,SE:0.22,SSE:0.2,S:0.15,SSW:0.15,SW:0.15,WSW:0.15,W:0.2,WNW:0.22,NW:0.22,NNW:0.2}, openness:1.0, facing:'S' },
+
+      // ── 3 new harbour spots from coordinates ──
+      { name: "Enghave Brygge", lat: 55.659831, lon: 12.560783, type: "brygge", water: true, desc: "New waterfront development, south-facing harbour promenade", confident: false,
+        shelter: {N:0.25,NNE:0.28,NE:0.35,ENE:0.3,E:0.2,ESE:0.15,SE:0.18,SSE:0.22,S:0.28,SSW:0.38,SW:0.48,WSW:0.55,W:0.65,WNW:0.58,NW:0.45,NNW:0.32}, openness:0.88, facing:'SE' },
+      { name: "Bådelaug Havnestad", lat: 55.659972, lon: 12.568360, type: "brygge", water: true, desc: "Boat club quay at Havnestad, open water aspect", confident: false,
+        shelter: {N:0.22,NNE:0.25,NE:0.3,ENE:0.22,E:0.15,ESE:0.18,SE:0.22,SSE:0.28,S:0.35,SSW:0.42,SW:0.5,WSW:0.55,W:0.6,WNW:0.52,NW:0.42,NNW:0.3}, openness:0.92, facing:'E' },
+      { name: "Bryggen Syd — Havnevigen", lat: 55.658313, lon: 12.566071, type: "brygge", water: true, desc: "Sheltered inner cove at Havnevigen, south Bryggen", confident: false,
+        shelter: {N:0.45,NNE:0.48,NE:0.5,ENE:0.42,E:0.3,ESE:0.25,SE:0.28,SSE:0.35,S:0.42,SSW:0.5,SW:0.55,WSW:0.58,W:0.62,WNW:0.55,NW:0.5,NNW:0.48}, openness:0.85, facing:'SE' }
+    ];
+
+    // Assign type labels (for filter)
+    var TYPE_LABELS = { park: "Parks", garden: "Gardens", beach: "Beaches", harbour: "Harbour", canal: "Canals", plaza: "Plazas", rooftop: "Rooftops", cemetery: "Cemeteries", forest: "Forest", lake: "Lakes", fortress: "Fortress", brygge: "Brygge" };
+
+    // ============ CONSTANTS ============
+    var DIRS_16 = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
+    var DIR_DEG_16 = {};
+    DIRS_16.forEach(function(d, i) { DIR_DEG_16[d] = i * 22.5; });
+
+    function degToDir16(deg) {
+      var idx = Math.round(((deg % 360 + 360) % 360) / 22.5) % 16;
+      return DIRS_16[idx];
+    }
+
+    function angDist(d1, d2) {
+      var diff = Math.abs(DIR_DEG_16[d1] - DIR_DEG_16[d2]);
+      if (diff > 180) diff = 360 - diff;
+      return diff;
+    }
+
+    function sunPosition(date, lat, lon) {
+      var rad = Math.PI / 180;
+      var dayOfYear = Math.floor((date - new Date(date.getFullYear(), 0, 0)) / 86400000);
+      var decl = 23.45 * Math.sin(rad * (360 / 365) * (dayOfYear - 81));
+      var hour = date.getHours() + date.getMinutes() / 60;
+      var solarTime = hour + (lon / 15) - date.getTimezoneOffset() / 60;
+      var hourAngle = 15 * (solarTime - 12);
+      var altitude = Math.asin(
+        Math.sin(rad * decl) * Math.sin(rad * lat) +
+        Math.cos(rad * decl) * Math.cos(rad * lat) * Math.cos(rad * hourAngle)
+      ) / rad;
+      var azimuth = Math.acos(
+        (Math.sin(rad * decl) - Math.sin(rad * altitude) * Math.sin(rad * lat)) /
+        (Math.cos(rad * altitude) * Math.cos(rad * lat))
+      ) / rad;
+      if (hourAngle > 0) azimuth = 360 - azimuth;
+      return { altitude: altitude, azimuth: azimuth };
+    }
+
+    function feelsLike(tempC, windMs) {
+      var windKmh = windMs * 3.6;
+      if (tempC <= 10 && windKmh >= 4.8) {
+        return 13.12 + 0.6215 * tempC - 11.37 * Math.pow(windKmh, 0.16) + 0.3965 * tempC * Math.pow(windKmh, 0.16);
+      } else if (windKmh >= 4.8) {
+        return tempC - Math.max(0, (windMs - 2) * 0.3);
+      }
+      return tempC;
+    }
+
+    function scoreSpot(spot, wind, sun, cloud, airTemp) {
+      var windDir = degToDir16(wind.direction);
+      var shelterScore = spot.shelter[windDir];
+      var windFelt = wind.speed * (1 - shelterScore);
+      var windScore = Math.max(0, 1 - windFelt / 12);
+
+      var sunScore = 0;
+      if (sun.altitude > 0) {
+        var sunDir = degToDir16(sun.azimuth);
+        var facingAlignment = 1 - angDist(spot.facing, sunDir) / 180;
+        var altitudeFactor = Math.min(1, sun.altitude / 40);
+        sunScore = spot.openness * facingAlignment * 0.6 + altitudeFactor * 0.4;
+        sunScore = Math.min(1, sunScore);
+      }
+      var cloudFactor = 1 - (cloud / 100) * 0.7;
+      sunScore *= cloudFactor;
+
+      var total = windScore * 0.55 + sunScore * 0.45;
+
+      var feelsLikeSpot = feelsLike(airTemp, windFelt);
+      if (sun.altitude > 0 && cloud < 70) {
+        var sunBonus = sunScore * 4 * (1 - cloud / 100);
+        feelsLikeSpot += sunBonus;
+      }
+
+      return { total: total, windScore: windScore, sunScore: sunScore,
+               shelterScore: shelterScore, windFelt: windFelt, windDir: windDir,
+               feelsLikeSpot: feelsLikeSpot };
+    }
+
+    // ============ STATE ============
+    var forecast = null; // hourly data
+    var marine = null; // marine hourly data
+    var map = null;
+    var markersLayer = null;
+    var selectedDayIdx = 0; // 0 = today
+    var selectedHour = new Date().getHours(); // 0-23
+    var activeFilter = 'all';
+    var showAll = false;
+
+    // ============ DATA FETCH ============
+    function fetchForecast() {
+      var url = 'https://api.open-meteo.com/v1/forecast?latitude=55.6761&longitude=12.5683' +
+        '&hourly=temperature_2m,apparent_temperature,cloud_cover,wind_speed_10m,wind_direction_10m' +
+        '&timezone=Europe/Copenhagen&wind_speed_unit=ms&forecast_days=6';
+      return fetch(url).then(function(res) {
+        if (!res.ok) throw new Error('Forecast fetch failed');
+        return res.json();
+      }).then(function(data) {
+        forecast = {
+          times: data.hourly.time, // array of ISO strings like "2026-04-24T14:00"
+          temp: data.hourly.temperature_2m,
+          apparent: data.hourly.apparent_temperature,
+          cloud: data.hourly.cloud_cover,
+          windSpeed: data.hourly.wind_speed_10m,
+          windDirection: data.hourly.wind_direction_10m
+        };
+      }).catch(function(e) {
+        console.warn('Forecast fetch failed:', e);
+        forecast = null;
+      });
+    }
+
+    function fetchMarine() {
+      var url = 'https://marine-api.open-meteo.com/v1/marine?latitude=55.6761&longitude=12.5683' +
+        '&hourly=sea_surface_temperature,wave_height' +
+        '&timezone=Europe/Copenhagen&forecast_days=6';
+      return fetch(url).then(function(res) {
+        if (!res.ok) throw new Error('Marine fetch failed');
+        return res.json();
+      }).then(function(data) {
+        marine = {
+          times: data.hourly.time,
+          sst: data.hourly.sea_surface_temperature,
+          waveHeight: data.hourly.wave_height
+        };
+      }).catch(function(e) {
+        console.warn('Marine fetch failed (ok to continue without water data):', e);
+        marine = null;
+      });
+    }
+
+    // ============ TIME HELPERS ============
+    // Get the hourly index into forecast arrays given day offset and hour
+    function getHourIndex(dayIdx, hour) {
+      if (!forecast) return null;
+      // Times are local — find first entry matching target date+hour
+      var now = new Date();
+      var target = new Date(now);
+      target.setDate(target.getDate() + dayIdx);
+      target.setHours(hour, 0, 0, 0);
+      var targetStr = target.getFullYear() + '-' +
+        String(target.getMonth() + 1).padStart(2, '0') + '-' +
+        String(target.getDate()).padStart(2, '0') + 'T' +
+        String(hour).padStart(2, '0') + ':00';
+      var idx = forecast.times.indexOf(targetStr);
+      return idx >= 0 ? idx : null;
+    }
+
+    function getCurrentWeather() {
+      var idx = getHourIndex(selectedDayIdx, selectedHour);
+      if (idx === null) return null;
+      var out = {
+        temp: forecast.temp[idx],
+        apparent: forecast.apparent[idx],
+        cloud: forecast.cloud[idx],
+        windSpeed: forecast.windSpeed[idx],
+        windDirection: forecast.windDirection[idx]
+      };
+      if (marine) {
+        var mIdx = marine.times.indexOf(forecast.times[idx]);
+        if (mIdx >= 0) {
+          out.sst = marine.sst[mIdx];
+          out.waveHeight = marine.waveHeight[mIdx];
+        }
+      }
+      return out;
+    }
+
+    function getSimTime() {
+      var now = new Date();
+      var t = new Date(now);
+      t.setDate(t.getDate() + selectedDayIdx);
+      t.setHours(selectedHour, 0, 0, 0);
+      return t;
+    }
+
+    // ============ MAP ============
+    function initMap() {
+      map = L.map('map', { zoomControl: true, attributionControl: true })
+        .setView([55.6800, 12.5800], 12);
+
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; OpenStreetMap',
+        subdomains: 'abc'
+      }).addTo(map);
+
+      markersLayer = L.layerGroup().addTo(map);
+
+      var WindControl = L.Control.extend({
+        options: { position: 'topright' },
+        onAdd: function() {
+          var div = L.DomUtil.create('div', 'wind-control');
+          div.innerHTML = '<div id="wind-arrow-svg" style="width:40px;height:40px;margin:0 auto"></div><div id="wind-arrow-label" style="font-size:11px;color:var(--text-muted);margin-top:4px">—</div>';
+          L.DomEvent.disableClickPropagation(div);
+          return div;
+        }
+      });
+      map.addControl(new WindControl());
+    }
+
+    function updateWindArrow(wind) {
+      var container = document.getElementById('wind-arrow-svg');
+      if (!container) return;
+      var rotation = wind.direction + 180;
+      container.innerHTML =
+        '<svg viewBox="0 0 40 40" style="width:100%;height:100%">' +
+          '<g transform="rotate(' + rotation + ', 20, 20)">' +
+            '<path d="M 20 4 L 27 18 L 22.5 18 L 22.5 34 L 17.5 34 L 17.5 18 L 13 18 Z" fill="#185fa5"/>' +
+          '</g>' +
+        '</svg>';
+      var lbl = document.getElementById('wind-arrow-label');
+      if (lbl) lbl.textContent = wind.speed.toFixed(1) + ' m/s ' + degToDir16(wind.direction);
+    }
+
+    function makeMarkerIcon(score, rank, showRankBadge) {
+      var bg, border;
+      if (score >= 0.65) { bg = '#97c459'; border = '#3b6d11'; }
+      else if (score >= 0.45) { bg = '#fac775'; border = '#854f0b'; }
+      else { bg = '#f09595'; border = '#a32d2d'; }
+
+      var size = 22 + score * 10;
+      var rankBadge = showRankBadge
+        ? '<div style="position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;background:white;border:1.5px solid ' + border + ';color:' + border + ';font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center">' + rank + '</div>'
+        : '';
+
+      return L.divIcon({
+        className: 'custom-marker',
+        html: '<div style="position:relative;width:' + size + 'px;height:' + size + 'px">' +
+                '<div style="width:100%;height:100%;border-radius:50%;background:' + bg + ';border:2px solid ' + border + ';opacity:0.9"></div>' +
+                rankBadge +
+              '</div>',
+        iconSize: [size, size],
+        iconAnchor: [size/2, size/2]
+      });
+    }
+
+    // ============ RENDERING ============
+    function renderDayPicker() {
+      var container = document.getElementById('day-picker');
+      container.innerHTML = '';
+      var now = new Date();
+      var dows = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      for (var i = 0; i < 6; i++) {
+        var d = new Date(now);
+        d.setDate(d.getDate() + i);
+        var chip = document.createElement('div');
+        chip.className = 'day-chip' + (i === selectedDayIdx ? ' active' : '');
+        chip.innerHTML = '<div class="dow">' + (i === 0 ? 'Today' : dows[d.getDay()]) + '</div>' +
+                         '<div class="dom">' + d.getDate() + '</div>';
+        (function(idx) {
+          chip.addEventListener('click', function() {
+            selectedDayIdx = idx;
+            renderAll();
+          });
+        })(i);
+        container.appendChild(chip);
+      }
+    }
+
+    function renderHourPicker() {
+      var container = document.getElementById('hour-picker');
+      container.innerHTML = '';
+      var nowHour = new Date().getHours();
+      for (var h = 6; h <= 22; h++) {
+        var chip = document.createElement('div');
+        var classes = 'hour-chip';
+        if (h === selectedHour) classes += ' active';
+        if (selectedDayIdx === 0 && h === nowHour) classes += ' now';
+        chip.className = classes;
+        chip.textContent = (selectedDayIdx === 0 && h === nowHour) ? 'Now' : String(h).padStart(2, '0');
+        (function(hr) {
+          chip.addEventListener('click', function() {
+            selectedHour = hr;
+            renderAll();
+          });
+        })(h);
+        container.appendChild(chip);
+      }
+
+      // Scroll active chip into view
+      setTimeout(function() {
+        var active = container.querySelector('.active');
+        if (active) active.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }, 10);
+    }
+
+    function renderFilterRow() {
+      var container = document.getElementById('filter-row');
+      container.innerHTML = '';
+
+      var types = { all: 'All' };
+      SPOTS.forEach(function(s) { types[s.type] = TYPE_LABELS[s.type] || s.type; });
+
+      Object.keys(types).forEach(function(key) {
+        var chip = document.createElement('div');
+        chip.className = 'filter-chip' + (key === activeFilter ? ' active' : '');
+        chip.textContent = types[key];
+        chip.addEventListener('click', function() {
+          activeFilter = key;
+          showAll = false;
+          renderList();
+          renderFilterRow();
+          renderMarkers();
+        });
+        container.appendChild(chip);
+      });
+    }
+
+    function getScored() {
+      var weather = getCurrentWeather();
+      if (!weather) return [];
+      var simTime = getSimTime();
+      var sun = sunPosition(simTime, 55.6761, 12.5683);
+      var wind = { direction: weather.windDirection, speed: weather.windSpeed };
+      return SPOTS.map(function(s) {
+        return { spot: s, score: scoreSpot(s, wind, sun, weather.cloud, weather.temp) };
+      });
+    }
+
+    function renderConditions() {
+      var weather = getCurrentWeather();
+      if (!weather) return;
+      var simTime = getSimTime();
+      var sun = sunPosition(simTime, 55.6761, 12.5683);
+
+      document.getElementById('wind-display').textContent = weather.windSpeed.toFixed(1) + ' m/s ' + degToDir16(weather.windDirection);
+      document.getElementById('temp-display').textContent = weather.temp.toFixed(1) + '°C';
+      document.getElementById('feel-display').textContent = weather.apparent.toFixed(1) + '°C';
+      document.getElementById('cloud-display').textContent = Math.round(weather.cloud) + '%';
+      document.getElementById('sun-display').textContent = sun.altitude > 0
+        ? Math.round(sun.altitude) + '° ' + degToDir16(sun.azimuth)
+        : 'Below horizon';
+
+      if (weather.sst != null) {
+        var waterStr = weather.sst.toFixed(1) + '°C';
+        if (weather.waveHeight != null) waterStr += ' · ' + weather.waveHeight.toFixed(1) + 'm';
+        document.getElementById('water-display').textContent = waterStr;
+      } else {
+        document.getElementById('water-display').textContent = '—';
+      }
+    }
+
+    function renderMarkers() {
+      var scored = getScored().sort(function(a, b) { return b.score.total - a.score.total; });
+      var filtered = activeFilter === 'all' ? scored : scored.filter(function(s) { return s.spot.type === activeFilter; });
+
+      markersLayer.clearLayers();
+      filtered.forEach(function(item, i) {
+        var rank = scored.indexOf(item) + 1;
+        var showRank = rank <= 3;
+        var marker = L.marker([item.spot.lat, item.spot.lon], { icon: makeMarkerIcon(item.score.total, rank, showRank) });
+
+        var feelsLikeStr = item.score.feelsLikeSpot.toFixed(1);
+        var shelterPct = Math.round(item.score.shelterScore * 100);
+        var waterHtml = '';
+        if (item.spot.water) {
+          var weather = getCurrentWeather();
+          if (weather && weather.sst != null) {
+            waterHtml = '<div class="popup-water">Water: ' + weather.sst.toFixed(1) + '°C';
+            if (weather.waveHeight != null) waterHtml += ' · Waves: ' + weather.waveHeight.toFixed(1) + ' m';
+            waterHtml += '</div>';
+          }
+        }
+        var popupHtml =
+          '<div class="popup-body">' +
+            '<div class="popup-title">#' + rank + ' ' + item.spot.name + '</div>' +
+            '<div class="popup-desc">' + item.spot.desc + '</div>' +
+            '<div class="popup-stats">' +
+              '<div>Score: <strong>' + Math.round(item.score.total * 100) + '/100</strong></div>' +
+              '<div>Feels like: <strong>' + feelsLikeStr + '°C</strong></div>' +
+              '<div>Shelter from ' + item.score.windDir + ': ' + shelterPct + '%</div>' +
+              '<div>Wind felt: ' + item.score.windFelt.toFixed(1) + ' m/s</div>' +
+            '</div>' +
+            waterHtml +
+          '</div>';
+        marker.bindPopup(popupHtml);
+        marker.addTo(markersLayer);
+      });
+
+      updateWindArrow({ direction: getCurrentWeather().windDirection, speed: getCurrentWeather().windSpeed });
+    }
+
+    function renderList() {
+      var scored = getScored().sort(function(a, b) { return b.score.total - a.score.total; });
+      var filtered = activeFilter === 'all' ? scored : scored.filter(function(s) { return s.spot.type === activeFilter; });
+
+      var list = document.getElementById('spots-list');
+      list.innerHTML = '';
+
+      var limit = showAll ? filtered.length : Math.min(8, filtered.length);
+      var weather = getCurrentWeather();
+
+      for (var i = 0; i < limit; i++) {
+        var item = filtered[i];
+        var score = item.score.total;
+        var badgeClass, badgeText;
+        if (score >= 0.65) { badgeClass = 'badge-great'; badgeText = 'Great'; }
+        else if (score >= 0.45) { badgeClass = 'badge-ok'; badgeText = 'OK'; }
+        else { badgeClass = 'badge-poor'; badgeText = 'Poor'; }
+
+        var card = document.createElement('div');
+        card.className = 'spot-card';
+
+        (function(spot) {
+          card.addEventListener('click', function() {
+            map.flyTo([spot.lat, spot.lon], 15, { duration: 0.8 });
+            setTimeout(function() {
+              markersLayer.eachLayer(function(m) {
+                var latlng = m.getLatLng();
+                if (Math.abs(latlng.lat - spot.lat) < 1e-6 && Math.abs(latlng.lng - spot.lon) < 1e-6) {
+                  m.openPopup();
+                }
+              });
+            }, 800);
+          });
+        })(item.spot);
+
+        var shelterPct = Math.round(item.score.shelterScore * 100);
+        var windFelt = item.score.windFelt.toFixed(1);
+        var feelsLikeStr = item.score.feelsLikeSpot.toFixed(1);
+        var feelsDelta = item.score.feelsLikeSpot - weather.apparent;
+        var warmerBadge = feelsDelta >= 2
+          ? '<span class="warmer">+' + feelsDelta.toFixed(1) + '°</span>'
+          : '';
+        var typeBadge = TYPE_LABELS[item.spot.type] ? '<span class="badge badge-type">' + TYPE_LABELS[item.spot.type] + '</span>' : '';
+        var confidenceNote = item.spot.confident === false ? ' · <span style="color:var(--text-faint)">rough estimate</span>' : '';
+
+        var waterRow = '';
+        if (item.spot.water && weather && weather.sst != null) {
+          waterRow = '<div class="spot-water">Water: ' + weather.sst.toFixed(1) + '°C';
+          if (weather.waveHeight != null) waterRow += ' · Waves: ' + weather.waveHeight.toFixed(1) + ' m';
+          waterRow += '</div>';
+        }
+
+        var rank = scored.indexOf(item) + 1;
+        card.innerHTML =
+          '<div class="spot-header">' +
+            '<div style="flex:1;min-width:0">' +
+              '<div class="spot-name-row">' +
+                '<span class="rank">' + rank + '</span>' +
+                '<span class="spot-name">' + item.spot.name + '</span>' +
+                typeBadge +
+                '<span class="badge ' + badgeClass + '">' + badgeText + '</span>' +
+              '</div>' +
+              '<div class="spot-desc">' + item.spot.desc + '</div>' +
+              '<div class="spot-stats">' +
+                'Shelter from ' + item.score.windDir + ': ' + shelterPct + '% · Wind felt: ' + windFelt + ' m/s · Feels like: <strong style="color:var(--text)">' + feelsLikeStr + '°C</strong>' + warmerBadge +
+                confidenceNote +
+              '</div>' +
+              waterRow +
+            '</div>' +
+            '<div class="spot-score">' + Math.round(score * 100) + '</div>' +
+          '</div>';
+
+        list.appendChild(card);
+      }
+
+      var moreWrap = document.getElementById('show-more-wrap');
+      moreWrap.innerHTML = '';
+      if (!showAll && filtered.length > 8) {
+        var moreBtn = document.createElement('div');
+        moreBtn.className = 'show-more';
+        moreBtn.textContent = 'Show all ' + filtered.length + ' spots ↓';
+        moreBtn.addEventListener('click', function() {
+          showAll = true;
+          renderList();
+        });
+        moreWrap.appendChild(moreBtn);
+      } else if (showAll && filtered.length > 8) {
+        var lessBtn = document.createElement('div');
+        lessBtn.className = 'show-more';
+        lessBtn.textContent = 'Show fewer ↑';
+        lessBtn.addEventListener('click', function() {
+          showAll = false;
+          renderList();
+          window.scrollTo({ top: document.getElementById('filter-row').offsetTop - 20, behavior: 'smooth' });
+        });
+        moreWrap.appendChild(lessBtn);
+      }
+    }
+
+    function renderAll() {
+      renderDayPicker();
+      renderHourPicker();
+      renderConditions();
+      renderMarkers();
+      renderList();
+    }
+
+    // ============ INIT ============
+    function init() {
+      Promise.all([fetchForecast(), fetchMarine()]).then(function() {
+        if (!forecast) {
+          document.getElementById('status').textContent = 'Could not load weather data. Please refresh.';
+          return;
+        }
+        document.getElementById('status').style.display = 'none';
+        document.getElementById('conditions').style.display = 'block';
+        document.getElementById('pickers').style.display = 'block';
+
+        initMap();
+        renderFilterRow();
+        renderAll();
+
+        var bounds = L.latLngBounds(SPOTS.map(function(s) { return [s.lat, s.lon]; }));
+        map.fitBounds(bounds, { padding: [30, 30] });
+        setTimeout(function() { map.invalidateSize(); }, 200);
+
+        // Auto-refresh the weather data every 15 minutes
+        setInterval(function() {
+          Promise.all([fetchForecast(), fetchMarine()]).then(renderAll);
+        }, 15 * 60 * 1000);
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  })();
+  </script>
+</body>
+</html>
