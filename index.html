@@ -371,11 +371,139 @@
       { name: "Bådelaug Havnestad", lat: 55.659972, lon: 12.568360, type: "brygge", water: true, desc: "Boat club quay at Havnestad, open water aspect", confident: false,
         shelter: {N:0.22,NNE:0.25,NE:0.3,ENE:0.22,E:0.15,ESE:0.18,SE:0.22,SSE:0.28,S:0.35,SSW:0.42,SW:0.5,WSW:0.55,W:0.6,WNW:0.52,NW:0.42,NNW:0.3}, openness:0.92, facing:'E' },
       { name: "Bryggen Syd — Havnevigen", lat: 55.658313, lon: 12.566071, type: "brygge", water: true, desc: "Sheltered inner cove at Havnevigen, south Bryggen", confident: false,
-        shelter: {N:0.45,NNE:0.48,NE:0.5,ENE:0.42,E:0.3,ESE:0.25,SE:0.28,SSE:0.35,S:0.42,SSW:0.5,SW:0.55,WSW:0.58,W:0.62,WNW:0.55,NW:0.5,NNW:0.48}, openness:0.85, facing:'SE' }
+        shelter: {N:0.45,NNE:0.48,NE:0.5,ENE:0.42,E:0.3,ESE:0.25,SE:0.28,SSE:0.35,S:0.42,SSW:0.5,SW:0.55,WSW:0.58,W:0.62,WNW:0.55,NW:0.5,NNW:0.48}, openness:0.85, facing:'SE' },
+
+      // ── Friends recommendations v0.3 ──
+
+      // Outdoor spots (non-commercial)
+      { name: "Kaktus Tower Rooftop (8F)", lat: 55.6701, lon: 12.5623, type: "rooftop", desc: "8th floor terrace facing Fisketorvet — exposed but great view SW", confident: false,
+        shelter: {N:0.5,NNE:0.48,NE:0.45,ENE:0.4,E:0.35,ESE:0.3,SE:0.28,SSE:0.3,S:0.35,SSW:0.4,SW:0.38,WSW:0.35,W:0.3,WNW:0.35,NW:0.42,NNW:0.48}, openness:0.95, facing:'SW' },
+      { name: "Havhøst — Bølgemarken", lat: 55.6823, lon: 12.5964, type: "harbour", water: true, desc: "Community garden and waterfront at Bølgemarken, Indre By", confident: false,
+        shelter: {N:0.55,NNE:0.5,NE:0.45,ENE:0.35,E:0.2,ESE:0.25,SE:0.32,SSE:0.4,S:0.48,SSW:0.52,SW:0.55,WSW:0.55,W:0.55,WNW:0.52,NW:0.5,NNW:0.52}, openness:0.88, facing:'E' },
+      { name: "Legeplads Enghave Brygge", lat: 55.6603, lon: 12.5598, type: "park", desc: "Playground area at Enghave Brygge, open south aspect", confident: false,
+        shelter: {N:0.3,NNE:0.32,NE:0.35,ENE:0.3,E:0.22,ESE:0.2,SE:0.22,SSE:0.28,S:0.35,SSW:0.42,SW:0.48,WSW:0.52,W:0.55,WNW:0.5,NW:0.42,NNW:0.35}, openness:0.9, facing:'S' },
+      { name: "Islands Brygge Wooden Dock", lat: 55.6638, lon: 12.5751, type: "harbour", water: true, desc: "Iconic wooden bathing dock at Islands Brygge harbour bath", confident: true,
+        shelter: {N:0.2,NNE:0.22,NE:0.28,ENE:0.2,E:0.12,ESE:0.15,SE:0.2,SSE:0.25,S:0.3,SSW:0.38,SW:0.48,WSW:0.58,W:0.72,WNW:0.62,NW:0.48,NNW:0.32}, openness:0.9, facing:'E' },
+      { name: "Wooden Dock — South Brygge", lat: 55.662692, lon: 12.565141, type: "harbour", water: true, desc: "Small wooden dock south of Islands Brygge, quieter than the main bath", confident: false,
+        shelter: {N:0.22,NNE:0.25,NE:0.3,ENE:0.22,E:0.15,ESE:0.18,SE:0.22,SSE:0.28,S:0.35,SSW:0.42,SW:0.5,WSW:0.55,W:0.65,WNW:0.55,NW:0.42,NNW:0.3}, openness:0.9, facing:'E' },
+      { name: "Onkel Dannys Plads", lat: 55.6718, lon: 12.5533, type: "plaza", desc: "Vesterbro plaza with benches, low buildings, afternoon sun", confident: false,
+        shelter: {N:0.62,NNE:0.6,NE:0.58,ENE:0.55,E:0.55,ESE:0.55,SE:0.55,SSE:0.57,S:0.58,SSW:0.6,SW:0.62,WSW:0.63,W:0.65,WNW:0.65,NW:0.63,NNW:0.62}, openness:0.78, facing:'SW' },
+
+      // Bars, cafés & kiosks — scored for shelter/sun, tagged as 'cafe'
+      // Waterfront kiosks & bars
+      { name: "Luftkastellet (Castle in the Air)", lat: 55.6815, lon: 12.5958, type: "cafe", water: true, rating: 4.2, desc: "Pier bar near Nyhavn — deck chairs, food trucks, cocktails. Most esplanada feel in CPH. Open daily 10am–10pm.", confident: false,
+        shelter: {N:0.55,NNE:0.52,NE:0.48,ENE:0.38,E:0.22,ESE:0.28,SE:0.35,SSE:0.42,S:0.5,SSW:0.52,SW:0.52,WSW:0.5,W:0.5,WNW:0.52,NW:0.52,NNW:0.55}, openness:0.9, facing:'SE' },
+      { name: "Toll Havs Kiosk", lat: 55.6898, lon: 12.6012, type: "cafe", water: true, rating: 4.6, desc: "Real deal kiosk on Refshaleøen by the water. Coffee, chai, cocktails. Near La Banchina. Open daily from 10am.", confident: false,
+        shelter: {N:0.35,NNE:0.32,NE:0.3,ENE:0.27,E:0.25,ESE:0.27,SE:0.3,SSE:0.35,S:0.4,SSW:0.42,SW:0.45,WSW:0.47,W:0.5,WNW:0.47,NW:0.42,NNW:0.38}, openness:0.92, facing:'W' },
+      { name: "Kayak Bar", lat: 55.6785, lon: 12.5901, type: "cafe", water: true, rating: 4.3, desc: "Harbour-side kiosk on Børskaj. Beer, smørrebrød, deck chairs facing the canal. Open till 1am weekends.", confident: false,
+        shelter: {N:0.6,NNE:0.58,NE:0.55,ENE:0.45,E:0.3,ESE:0.25,SE:0.22,SSE:0.25,S:0.32,SSW:0.42,SW:0.52,WSW:0.58,W:0.62,WNW:0.6,NW:0.6,NNW:0.6}, openness:0.82, facing:'S' },
+      { name: "Den Vandrette", lat: 55.6818, lon: 12.5972, type: "cafe", water: true, rating: 4.4, desc: "Harbour-side natural wine bar. Loire & Georgian list. Evenings only.", confident: false,
+        shelter: {N:0.58,NNE:0.55,NE:0.5,ENE:0.4,E:0.25,ESE:0.3,SE:0.38,SSE:0.45,S:0.52,SSW:0.55,SW:0.55,WSW:0.55,W:0.55,WNW:0.55,NW:0.55,NNW:0.57}, openness:0.85, facing:'E' },
+      { name: "Tipsy Mermaid", lat: 55.6792, lon: 12.5915, type: "cafe", water: true, rating: 4.5, desc: "Floating boat bar on Havnegade canal. Craft beer, swings on deck. Walk-up, casual, reasonable prices.", confident: false,
+        shelter: {N:0.65,NNE:0.62,NE:0.58,ENE:0.48,E:0.32,ESE:0.28,SE:0.28,SSE:0.32,S:0.38,SSW:0.48,SW:0.55,WSW:0.6,W:0.65,WNW:0.65,NW:0.65,NNW:0.65}, openness:0.8, facing:'S' },
+      { name: "Christianshavn Boat Rental & Café", lat: 55.6728, lon: 12.5895, type: "cafe", water: true, rating: 4.4, desc: "Canal-side kiosk-café in Christianshavn. Blankets, smørrebrød, hot chocolate. Family-run 20+ years. Open daily 12–8pm.", confident: false,
+        shelter: {N:0.72,NNE:0.7,NE:0.65,ENE:0.55,E:0.42,ESE:0.35,SE:0.28,SSE:0.3,S:0.35,SSW:0.45,SW:0.55,WSW:0.62,W:0.68,WNW:0.7,NW:0.72,NNW:0.72}, openness:0.78, facing:'S' },
+      { name: "Broens Street Food", lat: 55.6732, lon: 12.5920, type: "cafe", water: true, rating: 4.4, desc: "Outdoor food market on the Christianshavn waterfront. Bar kiosks, harbour views, casual seating. Open daily from 11am.", confident: false,
+        shelter: {N:0.6,NNE:0.58,NE:0.55,ENE:0.45,E:0.3,ESE:0.28,SE:0.28,SSE:0.32,S:0.38,SSW:0.48,SW:0.55,WSW:0.6,W:0.65,WNW:0.65,NW:0.65,NNW:0.62}, openness:0.85, facing:'S' },
+      { name: "Green Island CPH", lat: 55.6665, lon: 12.5682, type: "cafe", water: true, rating: 4.4, desc: "Floating bar/sauna on Kalvebod Brygge. Cocktails, harbour views, outdoor decking. From 7am.", confident: false,
+        shelter: {N:0.28,NNE:0.28,NE:0.28,ENE:0.28,E:0.28,ESE:0.28,SE:0.28,SSE:0.28,S:0.28,SSW:0.3,SW:0.35,WSW:0.4,W:0.45,WNW:0.4,NW:0.35,NNW:0.3}, openness:0.95, facing:'W' },
+      // Rooftop bars
+      { name: "ROOF Bar & Lounge", lat: 55.6730, lon: 12.5910, type: "cafe", rating: 4.6, desc: "Best view in CPH. 360° panorama, Christianshavn side. Book ahead.", confident: false,
+        shelter: {N:0.3,NNE:0.3,NE:0.3,ENE:0.3,E:0.3,ESE:0.3,SE:0.3,SSE:0.3,S:0.3,SSW:0.3,SW:0.3,WSW:0.3,W:0.3,WNW:0.3,NW:0.3,NNW:0.3}, openness:1.0, facing:'S' },
+      { name: "Next Rooftop Bar", lat: 55.6810, lon: 12.5780, type: "cafe", rating: 4.8, desc: "Hidden gem rooftop, green escape, reasonable prices.", confident: false,
+        shelter: {N:0.45,NNE:0.45,NE:0.45,ENE:0.45,E:0.45,ESE:0.45,SE:0.45,SSE:0.45,S:0.45,SSW:0.45,SW:0.45,WSW:0.45,W:0.45,WNW:0.45,NW:0.45,NNW:0.45}, openness:0.9, facing:'S' },
+      { name: "Level Six Rooftop Bar", lat: 55.6830, lon: 12.5700, type: "cafe", rating: 4.1, desc: "Large heated terrace at Nørreport. DJ weekends, open till 1am.", confident: false,
+        shelter: {N:0.5,NNE:0.5,NE:0.5,ENE:0.5,E:0.5,ESE:0.5,SE:0.5,SSE:0.5,S:0.5,SSW:0.5,SW:0.5,WSW:0.5,W:0.5,WNW:0.5,NW:0.5,NNW:0.5}, openness:0.88, facing:'S' },
+      { name: "Illum Rooftop", lat: 55.6791, lon: 12.5800, type: "cafe", rating: 4.2, desc: "Above Illum dept store on Strøget. Open from 11am, casual energy.", confident: false,
+        shelter: {N:0.5,NNE:0.5,NE:0.5,ENE:0.5,E:0.5,ESE:0.5,SE:0.5,SSE:0.5,S:0.5,SSW:0.5,SW:0.5,WSW:0.5,W:0.5,WNW:0.5,NW:0.5,NNW:0.5}, openness:0.85, facing:'S' },
+      // Park kiosks
+      { name: "Pavillon Beer Garden (Fælledparken)", lat: 55.7028, lon: 12.5631, type: "cafe", rating: 4.2, desc: "Beer garden pavilion inside Fælledparken. Cold beer, snacks, park crowd. Open daily 12–8pm.", confident: false,
+        shelter: {N:0.3,NNE:0.3,NE:0.3,ENE:0.3,E:0.3,ESE:0.3,SE:0.3,SSE:0.3,S:0.3,SSW:0.3,SW:0.3,WSW:0.3,W:0.3,WNW:0.3,NW:0.3,NNW:0.3}, openness:0.92, facing:'S' },
+      { name: "Eventyrkiosken (Fælledparken)", lat: 55.7015, lon: 12.5612, type: "cafe", rating: 4.1, desc: "Classic kiosk inside Fælledparken. Coffee, beer, ice cream. Grab and sit on the grass. Open daily 9am–6pm.", confident: false,
+        shelter: {N:0.3,NNE:0.3,NE:0.3,ENE:0.3,E:0.3,ESE:0.3,SE:0.3,SSE:0.3,S:0.3,SSW:0.3,SW:0.3,WSW:0.3,W:0.3,WNW:0.3,NW:0.3,NNW:0.3}, openness:0.92, facing:'S' },
+      // Natural wine & neighbourhood bars
+      { name: "Apollo Bar (Charlottenborg)", lat: 55.6796, lon: 12.5852, type: "cafe", rating: 3.7, desc: "Kunsthal Charlottenborg courtyard. Arty crowd, good sourdough & coffee.", confident: false,
+        shelter: {N:0.82,NNE:0.82,NE:0.82,ENE:0.82,E:0.82,ESE:0.82,SE:0.82,SSE:0.82,S:0.82,SSW:0.82,SW:0.82,WSW:0.82,W:0.82,WNW:0.82,NW:0.82,NNW:0.82}, openness:0.55, facing:'S' },
+      { name: "NyhavnC", lat: 55.6800, lon: 12.5928, type: "cafe", water: true, rating: 4.2, desc: "Iconic Nyhavn canal front. Heated outdoor seats. Drinks over food.", confident: false,
+        shelter: {N:0.83,NNE:0.82,NE:0.75,ENE:0.55,E:0.4,ESE:0.3,SE:0.2,SSE:0.17,S:0.15,SSW:0.22,SW:0.3,WSW:0.4,W:0.5,WNW:0.65,NW:0.8,NNW:0.83}, openness:0.75, facing:'S' },
+      { name: "The GOAT — Vesterbro Torv", lat: 55.6702, lon: 12.5501, type: "cafe", rating: 4.3, desc: "Vesterbro square terrace. Heated seats + blankets, open till 2am.", confident: false,
+        shelter: {N:0.65,NNE:0.63,NE:0.6,ENE:0.58,E:0.58,ESE:0.58,SE:0.58,SSE:0.6,S:0.6,SSW:0.62,SW:0.63,WSW:0.65,W:0.67,WNW:0.68,NW:0.68,NNW:0.67}, openness:0.75, facing:'S' },
+      { name: "not your USUAL wine bar", lat: 55.6882, lon: 12.5551, type: "cafe", rating: 4.7, desc: "Best natural wine bar in CPH. Flights concept, small plates. From 3pm.", confident: false,
+        shelter: {N:0.72,NNE:0.7,NE:0.7,ENE:0.68,E:0.68,ESE:0.68,SE:0.68,SSE:0.68,S:0.68,SSW:0.7,SW:0.7,WSW:0.72,W:0.72,WNW:0.72,NW:0.72,NNW:0.72}, openness:0.6, facing:'S' },
+      { name: "Villa Vino", lat: 55.6762, lon: 12.5700, type: "cafe", rating: 4.6, desc: "Classic wine bar near Rådhuspladsen. Charcuterie boards, from noon.", confident: false,
+        shelter: {N:0.72,NNE:0.7,NE:0.7,ENE:0.7,E:0.7,ESE:0.7,SE:0.7,SSE:0.7,S:0.7,SSW:0.7,SW:0.7,WSW:0.72,W:0.72,WNW:0.72,NW:0.72,NNW:0.72}, openness:0.62, facing:'S' },
+      { name: "Pompette", lat: 55.6902, lon: 12.5538, type: "cafe", rating: 4.4, desc: "Nørrebro natural wine. Relaxed local crowd. Open daily from noon.", confident: false,
+        shelter: {N:0.7,NNE:0.7,NE:0.68,ENE:0.65,E:0.65,ESE:0.65,SE:0.65,SSE:0.65,S:0.65,SSW:0.67,SW:0.68,WSW:0.7,W:0.72,WNW:0.72,NW:0.72,NNW:0.7}, openness:0.62, facing:'S' },
+      { name: "Marstrand Café & Vinbar", lat: 55.6755, lon: 12.5278, type: "cafe", rating: 4.6, desc: "Frederiksberg gem. Jazz nights, wine tastings, terrace. From 11am.", confident: false,
+        shelter: {N:0.7,NNE:0.7,NE:0.68,ENE:0.65,E:0.65,ESE:0.65,SE:0.65,SSE:0.65,S:0.65,SSW:0.67,SW:0.68,WSW:0.7,W:0.72,WNW:0.72,NW:0.72,NNW:0.7}, openness:0.65, facing:'S' },
+      { name: "Søernes Ølbar", lat: 55.6922, lon: 12.5610, type: "cafe", water: true, rating: 4.4, desc: "Below-street craft beer bar by the lakes. Hidden entrance, outdoor benches by water in summer. From 3pm.", confident: false,
+        shelter: {N:0.55,NNE:0.55,NE:0.52,ENE:0.5,E:0.5,ESE:0.52,SE:0.55,SSE:0.55,S:0.55,SSW:0.55,SW:0.55,WSW:0.55,W:0.55,WNW:0.55,NW:0.55,NNW:0.55}, openness:0.72, facing:'W' },
+      { name: "Nørrebro Späti", lat: 55.6910, lon: 12.5530, type: "cafe", rating: 5.0, desc: "Berlin-style Späti in Nørrebro. Natural wine, craft beer, sandwiches, pavement seating. Tiny, cult following. From 10am (closed Mon).", confident: false,
+        shelter: {N:0.72,NNE:0.7,NE:0.68,ENE:0.65,E:0.65,ESE:0.65,SE:0.65,SSE:0.65,S:0.65,SSW:0.67,SW:0.68,WSW:0.7,W:0.72,WNW:0.72,NW:0.72,NNW:0.72}, openness:0.55, facing:'S' },
+      { name: "KIHOSKH", lat: 55.6695, lon: 12.5491, type: "cafe", rating: 4.6, desc: "Vesterbro cult corner kiosk. Craft beer, natural wine, pastries. Outdoor pavement till late. Open daily 7am–2am. Iconic.", confident: false,
+        shelter: {N:0.68,NNE:0.67,NE:0.65,ENE:0.62,E:0.62,ESE:0.62,SE:0.62,SSE:0.62,S:0.62,SSW:0.65,SW:0.67,WSW:0.68,W:0.7,WNW:0.7,NW:0.7,NNW:0.68}, openness:0.65, facing:'S' },
+      { name: "Mikkeller & Friends", lat: 55.6908, lon: 12.5482, type: "cafe", rating: 4.6, desc: "30+ taps in Nørrebro. Outdoor benches in summer. More local than the OG bar. From 2–3pm daily.", confident: false,
+        shelter: {N:0.7,NNE:0.7,NE:0.68,ENE:0.65,E:0.65,ESE:0.65,SE:0.65,SSE:0.65,S:0.65,SSW:0.67,SW:0.68,WSW:0.7,W:0.72,WNW:0.72,NW:0.72,NNW:0.7}, openness:0.6, facing:'S' },
+      { name: "Mikkeller Bar", lat: 55.6697, lon: 12.5562, type: "cafe", rating: 4.6, desc: "The OG Vesterbro craft beer bar. 20 taps, outdoor seating on quiet street. Pilgrimage spot. From 3pm.", confident: false,
+        shelter: {N:0.72,NNE:0.7,NE:0.68,ENE:0.65,E:0.65,ESE:0.65,SE:0.65,SSE:0.65,S:0.65,SSW:0.67,SW:0.68,WSW:0.7,W:0.72,WNW:0.72,NW:0.72,NNW:0.72}, openness:0.62, facing:'S' },
+      { name: "The Living Room", lat: 55.6800, lon: 12.5760, type: "cafe", rating: 4.5, desc: "Latin Quarter café-bar. Coffee by day, cocktails till 1am weekends.", confident: false,
+        shelter: {N:0.75,NNE:0.73,NE:0.72,ENE:0.72,E:0.72,ESE:0.72,SE:0.72,SSE:0.72,S:0.72,SSW:0.72,SW:0.72,WSW:0.73,W:0.75,WNW:0.75,NW:0.75,NNW:0.75}, openness:0.58, facing:'S' },
+      { name: "Cafe Svejk", lat: 55.6756, lon: 12.5290, type: "cafe", rating: 4.4, desc: "Frederiksberg classic. Czech beer, smørrebrød, big terrace till 2am.", confident: false,
+        shelter: {N:0.68,NNE:0.67,NE:0.65,ENE:0.63,E:0.63,ESE:0.63,SE:0.63,SSE:0.63,S:0.63,SSW:0.65,SW:0.67,WSW:0.68,W:0.7,WNW:0.7,NW:0.7,NNW:0.68}, openness:0.7, facing:'S' },
+      { name: "Cafe Postgaarden", lat: 55.6740, lon: 12.5280, type: "cafe", rating: 4.5, desc: "Frederiksberg Allé pavement classic. Sunny terrace, cheap drinks, bring-your-own-food. Closed Sundays, from 1pm.", confident: false,
+        shelter: {N:0.68,NNE:0.67,NE:0.65,ENE:0.63,E:0.63,ESE:0.63,SE:0.63,SSE:0.63,S:0.63,SSW:0.65,SW:0.67,WSW:0.68,W:0.7,WNW:0.7,NW:0.7,NNW:0.68}, openness:0.7, facing:'S' },
+      { name: "South Harbour Café", lat: 55.6452, lon: 12.5415, type: "cafe", rating: 4.6, desc: "Sydhavn neighbourhood café. Moroccan food, mint tea, very local crowd. Open daily 10am–8pm. Worth the detour.", confident: false,
+        shelter: {N:0.65,NNE:0.63,NE:0.62,ENE:0.6,E:0.6,ESE:0.6,SE:0.6,SSE:0.6,S:0.6,SSW:0.62,SW:0.63,WSW:0.65,W:0.67,WNW:0.67,NW:0.67,NNW:0.65}, openness:0.72, facing:'S' },
+      { name: "Restaurant Gemini", lat: 55.6793, lon: 12.5575, type: "cafe", rating: 4.3, desc: "Vesterbro restaurant with outdoor terrace, Italian-inspired menu.", confident: false,
+        shelter: {N:0.7,NNE:0.68,NE:0.67,ENE:0.65,E:0.65,ESE:0.65,SE:0.65,SSE:0.65,S:0.65,SSW:0.67,SW:0.68,WSW:0.7,W:0.72,WNW:0.72,NW:0.72,NNW:0.7}, openness:0.65, facing:'S' },
+
+      // ── Playgrounds v0.3.1 ──
+      // ⭐ Standouts
+      { name: "The Traffic Playground", lat: 55.7052, lon: 12.5731, type: "playground", rating: 4.7, desc: "Østerbro. Kids ride bikes on mini roads with traffic lights & signs. Free bike rental. Fenced & safe. Weekdays 9am–4:30pm.", confident: false,
+        shelter: {N:0.55,NNE:0.53,NE:0.5,ENE:0.5,E:0.5,ESE:0.5,SE:0.5,SSE:0.52,S:0.55,SSW:0.57,SW:0.58,WSW:0.58,W:0.58,WNW:0.57,NW:0.55,NNW:0.55}, openness:0.8, facing:'S' },
+      { name: "Konditaget Lüders", lat: 55.7038, lon: 12.5942, type: "playground", rating: 4.5, desc: "Nordhavn. Rooftop playground on car park — trampolines, climbing, swings, harbour views. Open daily 7am–10pm.", confident: false,
+        shelter: {N:0.2,NNE:0.2,NE:0.2,ENE:0.2,E:0.2,ESE:0.2,SE:0.2,SSE:0.2,S:0.2,SSW:0.2,SW:0.2,WSW:0.2,W:0.2,WNW:0.2,NW:0.2,NNW:0.2}, openness:1.0, facing:'S' },
+      { name: "Bredegrund Byggelegeplads", lat: 55.6534, lon: 12.5955, type: "playground", rating: 4.7, desc: "Amager. One of CPH's biggest staffed playgrounds. Zip-line, sand, water area, bikes, climbing. Enclosed & safe. Weekdays 9am–5pm.", confident: false,
+        shelter: {N:0.65,NNE:0.63,NE:0.6,ENE:0.6,E:0.6,ESE:0.6,SE:0.6,SSE:0.62,S:0.65,SSW:0.67,SW:0.68,WSW:0.68,W:0.68,WNW:0.67,NW:0.65,NNW:0.65}, openness:0.75, facing:'S' },
+      { name: "The Tower Playground (Fælledparken)", lat: 55.7041, lon: 12.5618, type: "playground", rating: 4.5, desc: "Østerbro. CPH tower replicas as climbing structures. Football, basketball, shade. Weekdays 9am–4:30pm.", confident: false,
+        shelter: {N:0.3,NNE:0.3,NE:0.3,ENE:0.3,E:0.3,ESE:0.3,SE:0.3,SSE:0.3,S:0.3,SSW:0.3,SW:0.3,WSW:0.3,W:0.3,WNW:0.3,NW:0.3,NNW:0.3}, openness:0.92, facing:'S' },
+      { name: "Nørrebroparken Playground", lat: 55.6982, lon: 12.5468, type: "playground", rating: 4.3, desc: "Nørrebro. Bermuda Triangle theme, huge variety of activities, indoor area, small animals, summer paddling pool. Weekdays 9am–5pm.", confident: false,
+        shelter: {N:0.6,NNE:0.58,NE:0.55,ENE:0.55,E:0.55,ESE:0.55,SE:0.55,SSE:0.57,S:0.6,SSW:0.62,SW:0.63,WSW:0.63,W:0.63,WNW:0.62,NW:0.6,NNW:0.6}, openness:0.78, facing:'S' },
+      // 🌿 Staffed playgrounds
+      { name: "Legepladsen i Skydebanehaven", lat: 55.6698, lon: 12.5542, type: "playground", rating: 4.5, desc: "Vesterbro. Parrot slide, bikes, scooters, summer water basin, coffee spot, indoor room. Weekdays 9am–5pm.", confident: true,
+        shelter: {N:0.9,NNE:0.88,NE:0.88,ENE:0.88,E:0.88,ESE:0.88,SE:0.88,SSE:0.88,S:0.88,SSW:0.88,SW:0.88,WSW:0.88,W:0.9,WNW:0.9,NW:0.9,NNW:0.9}, openness:0.5, facing:'S' },
+      { name: "Christianshavns Vold Legeplads", lat: 55.6714, lon: 12.5947, type: "playground", rating: 4.6, desc: "Christianshavn. Zip-line, bikes, moon cars, sandbox, basketball & football court. Weekdays 9am–4:30pm.", confident: false,
+        shelter: {N:0.6,NNE:0.58,NE:0.55,ENE:0.52,E:0.5,ESE:0.52,SE:0.55,SSE:0.58,S:0.6,SSW:0.62,SW:0.63,WSW:0.62,W:0.6,WNW:0.6,NW:0.6,NNW:0.6}, openness:0.78, facing:'S' },
+      { name: "Legepladsen i Hans Tavsens Park", lat: 55.6887, lon: 12.5558, type: "playground", rating: 4.5, desc: "Nørrebro. Staffed, tricycles, bikes, indoor play area. Good for under 8s. Mon–Sat 9am–5:30pm.", confident: false,
+        shelter: {N:0.65,NNE:0.63,NE:0.6,ENE:0.6,E:0.6,ESE:0.6,SE:0.6,SSE:0.62,S:0.65,SSW:0.67,SW:0.68,WSW:0.68,W:0.68,WNW:0.67,NW:0.65,NNW:0.65}, openness:0.75, facing:'S' },
+      { name: "Playground in Enghave Park", lat: 55.6676, lon: 12.5475, type: "playground", rating: 4.4, desc: "Vesterbro. Staffed, indoor area for rainy days, BBQ nights every other Wednesday. Open 24h, staffed till 4:30pm weekdays.", confident: false,
+        shelter: {N:0.6,NNE:0.58,NE:0.55,ENE:0.55,E:0.55,ESE:0.55,SE:0.55,SSE:0.57,S:0.6,SSW:0.62,SW:0.63,WSW:0.63,W:0.63,WNW:0.62,NW:0.6,NNW:0.6}, openness:0.78, facing:'S' },
+      { name: "Naturlegepladsen (Sydhavn)", lat: 55.6448, lon: 12.5438, type: "playground", rating: 4.5, desc: "Sydhavn/Amager. Nature playground — water activities, fire pit, pedal trikes, picnic area. Weekdays 9am–4:30pm.", confident: false,
+        shelter: {N:0.55,NNE:0.53,NE:0.5,ENE:0.5,E:0.5,ESE:0.5,SE:0.5,SSE:0.52,S:0.55,SSW:0.57,SW:0.58,WSW:0.58,W:0.58,WNW:0.57,NW:0.55,NNW:0.55}, openness:0.82, facing:'S' },
+      { name: "Bellahøj Naturlegeplads", lat: 55.7098, lon: 12.5198, type: "playground", rating: 4.5, desc: "Brønshøj. Pirate ship, forest paths, zip-line, water pump, big slide. Open 24h. Large green area.", confident: false,
+        shelter: {N:0.68,NNE:0.67,NE:0.65,ENE:0.65,E:0.65,ESE:0.65,SE:0.65,SSE:0.67,S:0.68,SSW:0.7,SW:0.7,WSW:0.7,W:0.7,WNW:0.7,NW:0.68,NNW:0.68}, openness:0.7, facing:'S' },
+      // 🏰 Park & themed
+      { name: "Legepladsen i Kongens Have", lat: 55.6853, lon: 12.5808, type: "playground", rating: 4.3, desc: "City centre. Dragon theme, sand, bridges, moat. Inside King's Garden. Daily 7am–5pm.", confident: true,
+        shelter: {N:0.8,NNE:0.78,NE:0.75,ENE:0.78,E:0.8,ESE:0.75,SE:0.7,SSE:0.67,S:0.65,SSW:0.67,SW:0.7,WSW:0.75,W:0.8,WNW:0.82,NW:0.85,NNW:0.82}, openness:0.65, facing:'S' },
+      { name: "Playground in Ørstedsparken", lat: 55.6824, lon: 12.5692, type: "playground", rating: 4.6, desc: "City centre. Staffed, sand toys, bikes, scooters, swings, ping pong, giant blocks. Weekdays 9am–4pm.", confident: true,
+        shelter: {N:0.72,NNE:0.7,NE:0.68,ENE:0.65,E:0.62,ESE:0.6,SE:0.6,SSE:0.6,S:0.6,SSW:0.62,SW:0.65,WSW:0.67,W:0.7,WNW:0.72,NW:0.72,NNW:0.72}, openness:0.7, facing:'S' },
+      { name: "The Large Playground (Fælledparken)", lat: 55.7019, lon: 12.5608, type: "playground", rating: 4.8, desc: "Østerbro. Obstacle courses, trampolines, open green space. CPH's biggest park. Open 24h.", confident: false,
+        shelter: {N:0.28,NNE:0.28,NE:0.28,ENE:0.28,E:0.28,ESE:0.28,SE:0.28,SSE:0.28,S:0.28,SSW:0.28,SW:0.28,WSW:0.28,W:0.28,WNW:0.28,NW:0.28,NNW:0.28}, openness:0.95, facing:'S' },
+      { name: "Eastern Anlæg Playground", lat: 55.6872, lon: 12.5858, type: "playground", rating: 4.3, desc: "Østerbro. Open space near a lake, good for bikes & scooters, ball sports. Open 24h.", confident: false,
+        shelter: {N:0.45,NNE:0.43,NE:0.42,ENE:0.42,E:0.42,ESE:0.42,SE:0.42,SSE:0.43,S:0.45,SSW:0.47,SW:0.48,WSW:0.48,W:0.48,WNW:0.47,NW:0.45,NNW:0.45}, openness:0.85, facing:'S' },
+      { name: "Playground at Sankt Annæ Plads", lat: 55.6823, lon: 12.5942, type: "playground", rating: 4.1, desc: "City centre / Nyhavn area. Small, simple, convenient if nearby. Open 24h.", confident: false,
+        shelter: {N:0.55,NNE:0.53,NE:0.5,ENE:0.45,E:0.35,ESE:0.3,SE:0.3,SSE:0.35,S:0.42,SSW:0.5,SW:0.55,WSW:0.58,W:0.6,WNW:0.58,NW:0.55,NNW:0.55}, openness:0.82, facing:'S' },
+      // 🏴‍☠️ Unusual / niche
+      { name: "Zipline Park (Christiania)", lat: 55.6728, lon: 12.6002, type: "playground", rating: 4.9, desc: "Christiania. Tire zip-line, swings, very chilled vibe. Adults hang out, kids run free. Open 24h. Free.", confident: false,
+        shelter: {N:0.65,NNE:0.63,NE:0.6,ENE:0.6,E:0.6,ESE:0.6,SE:0.6,SSE:0.62,S:0.65,SSW:0.67,SW:0.68,WSW:0.68,W:0.68,WNW:0.67,NW:0.65,NNW:0.65}, openness:0.75, facing:'S' },
+      { name: "Rasmus Klump Playground (Tivoli)", lat: 55.6742, lon: 12.5682, type: "playground", rating: 4.6, desc: "Inside Tivoli (paid entry). Suspended huts, bridges, slides, hourly outdoor theatre shows. Toddlers to ~10 years.", confident: true,
+        shelter: {N:0.82,NNE:0.8,NE:0.78,ENE:0.78,E:0.78,ESE:0.78,SE:0.78,SSE:0.78,S:0.78,SSW:0.78,SW:0.78,WSW:0.78,W:0.8,WNW:0.82,NW:0.82,NNW:0.82}, openness:0.55, facing:'S' },
+      { name: "Legepladsen på Panterens Bastion", lat: 55.6722, lon: 12.5932, type: "playground", rating: 3.7, desc: "Christianshavn moat. Small, basic, overlooks the water. Good for toddlers passing by.", confident: false,
+        shelter: {N:0.55,NNE:0.53,NE:0.5,ENE:0.48,E:0.45,ESE:0.48,SE:0.5,SSE:0.53,S:0.55,SSW:0.57,SW:0.58,WSW:0.57,W:0.55,WNW:0.55,NW:0.55,NNW:0.55}, openness:0.82, facing:'S' }
     ];
 
     // Assign type labels (for filter)
-    var TYPE_LABELS = { park: "Parks", garden: "Gardens", beach: "Beaches", harbour: "Harbour", canal: "Canals", plaza: "Plazas", rooftop: "Rooftops", cemetery: "Cemeteries", forest: "Forest", lake: "Lakes", fortress: "Fortress", brygge: "Brygge" };
+    var TYPE_LABELS = { park: "Parks", garden: "Gardens", beach: "Beaches", harbour: "Harbour", canal: "Canals", plaza: "Plazas", rooftop: "Rooftops", cemetery: "Cemeteries", forest: "Forest", lake: "Lakes", fortress: "Fortress", brygge: "Brygge", cafe: "Bars & Cafés", playground: "Playgrounds 🧒" };
 
     // ============ CONSTANTS ============
     var DIRS_16 = ['N','NNE','NE','ENE','E','ESE','SE','SSE','S','SSW','SW','WSW','W','WNW','NW','NNW'];
@@ -728,6 +856,7 @@
 
         var feelsLikeStr = item.score.feelsLikeSpot.toFixed(1);
         var shelterPct = Math.round(item.score.shelterScore * 100);
+        var ratingHtml = item.spot.rating ? '<div>Rating: <strong>' + item.spot.rating.toFixed(1) + ' ⭐</strong></div>' : '';
         var waterHtml = '';
         if (item.spot.water) {
           var weather = getCurrentWeather();
@@ -742,6 +871,7 @@
             '<div class="popup-title">#' + rank + ' ' + item.spot.name + '</div>' +
             '<div class="popup-desc">' + item.spot.desc + '</div>' +
             '<div class="popup-stats">' +
+              ratingHtml +
               '<div>Score: <strong>' + Math.round(item.score.total * 100) + '/100</strong></div>' +
               '<div>Feels like: <strong>' + feelsLikeStr + '°C</strong></div>' +
               '<div>Shelter from ' + item.score.windDir + ': ' + shelterPct + '%</div>' +
@@ -800,6 +930,7 @@
           : '';
         var typeBadge = TYPE_LABELS[item.spot.type] ? '<span class="badge badge-type">' + TYPE_LABELS[item.spot.type] + '</span>' : '';
         var confidenceNote = item.spot.confident === false ? ' · <span style="color:var(--text-faint)">rough estimate</span>' : '';
+        var ratingRow = item.spot.rating ? '<div class="spot-stats" style="margin-top:3px">' + item.spot.rating.toFixed(1) + ' ⭐ Google rating</div>' : '';
 
         var waterRow = '';
         if (item.spot.water && weather && weather.sst != null) {
@@ -823,6 +954,7 @@
                 'Shelter from ' + item.score.windDir + ': ' + shelterPct + '% · Wind felt: ' + windFelt + ' m/s · Feels like: <strong style="color:var(--text)">' + feelsLikeStr + '°C</strong>' + warmerBadge +
                 confidenceNote +
               '</div>' +
+              ratingRow +
               waterRow +
             '</div>' +
             '<div class="spot-score">' + Math.round(score * 100) + '</div>' +
